@@ -1,18 +1,22 @@
-using Distributions
-using ForwardDiff
-using ChebyshevStuff
-using PyPlot
-using TimerOutputs
-using LinearAlgebra
+using JuMP
+using Clp
 
-function price_mechanism()
-    
-end
+m = Model(solver = ClpSolver())
+@variable(m, alloc[1:M,1:N] >= 0)
+#@variable(m, util[1:M,1:N] >= 0)
+#@variable(m, dist[1:M] >= 0)
+#@variable(m, 0 <= capacity[1:N])
+util[1:M,1:N] = ?
+dist[1:M] = ?
+capacity[1:N] = ?
 
-function pm_constraint()
-    
-end
+@objective(m, Max, sum(dist[i](sum(util[i,j])*alloc[i,j] for j in 1:N) for i in 1:M))
+@constraint(m, ((sum(util[i,j])*alloc[i,j] for i in 1:N)) - (sum(util[i,k])*alloc[i,k] for i in 1:N)) >= 0 for j,k in 1:M)
+@constraint(m, sum(dist[i]*alloc[i,j] for i in 1:M) <= capacity[j] for j in 1:N)
+@constraint(m, sum(alloc[i,j] for all j in 1:N) <= 1 for i in 1:M)
+print(m)
 
-function max_run()
-    
-end
+status = solve(m)
+
+println("Objective value: ", getobjectivevalue(m))
+println("m = ", getvalue(alloc[i,j]))
