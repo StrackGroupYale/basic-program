@@ -1,14 +1,12 @@
-#import Pkg; Pkg.add("JuMP")
-#import Pkg; Pkg.add("Clp")
 using JuMP
-using Cbc
+using Cbc 
 
-# && (x => 0)
 #@variable(m, util[1:M,1:N] >= 0)
 #@variable(m, dist[1:M] >= 0)
 #@variable(m, 0 <= capacity[1:N])
 
-#Set M = 20
+m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
+
 M = 20 #rows
 #Set N = 10
 N = 10 #columns
@@ -36,6 +34,7 @@ alloc =
   [9 9 9 9 9 9 9 9 9 9];
   [0 0 0 0 0 0 0 0 0 0];
 ]
+
 
 
 
@@ -69,30 +68,17 @@ dist = [1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0]
 #Capacity DataSet
 capacity = [1 1 1 1 1 1 1 1 1 1]
 
-m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
-@variable(m, 0 <= x)
-
-max_ob = 1
-for j in 1:N
-    for i in 1:M
-        n_o = @objective(m, Max, sum(dist[i]*(sum(util[i,j])*alloc[i,j])))
-        if (n_o > max_ob)
-            global max_ob = n_o
-        else
-        end
+for j in 1:N 
+    for i in 1:M 
+        newmatrix = sum(dist[i]sum[util[i,j]])*alloc[i,j]
     end
 end
+        
+
 #@objective(m, Max, sum(dist[i](sum(util[i,j])*alloc[i,j] for j in 1:N) for i in 1:M))
-
-@constraint(m, ((sum(util[i,j]*alloc[i,j] for i in 1:N)) - (sum(util[i,k]*alloc[i,k] for i in 1:N))) >= 0 for j in 1:M, for k in 1:M)
-
-@constraint(m, sum(dist[i]*alloc[i,j] for i in 1:M) <= capacity[j] for j in 1:N)
-@constraint(m, sum(alloc[i,j] for all j in 1:N) <= 1 for i in 1:M)
-
-##Make x equiv to allocation
-@constraint(m, x == alloc[i][j] for i in 1:M, for j in 1:N)
-@constraint(m, x => 0)
-
+#@constraint(m, ((sum(util[i,j])*alloc[i,j] for i in 1:N)) - (sum(util[i,k])*alloc[i,k] for i in 1:N)) >= 0 for j,k in 1:M)
+#@constraint(m, sum(dist[i]*alloc[i,j] for i in 1:M) <= capacity[j] for j in 1:N)
+#@constraint(m, sum(alloc[i,j] for all j in 1:N) <= 1 for i in 1:M)
 print(m)
 
 status = solve(m)
