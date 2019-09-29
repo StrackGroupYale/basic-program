@@ -84,9 +84,9 @@ for j in 1:N
 end
 #@objective(m, Max, sum(dist[i](sum(util[i,j])*alloc[i,j] for j in 1:N) for i in 1:M))
 
-@constraint(m, ((sum(util[i,j]*alloc[i,j] for i in 1:N)) - (sum(util[i,k]*alloc[i,k] for i in 1:N))) >= 0 for j in 1:M, for k in 1:M)
+@constraint(m, ((sum(util[i,j]*alloc[i,j] for i=1:N) for j=1:M) - (sum(util[i,k]*alloc[i,k] for i=1:N) for k=1:M)) >= 0)
 
-@constraint(m, sum(dist[i]*alloc[i,j] for i in 1:M) <= capacity[j] for j in 1:N)
+@constraint(m, sum(dist[i]*alloc[i,j] for i=1:M) <= capacity[j] for j=1:N)
 @constraint(m, sum(alloc[i,j] for all j in 1:N) <= 1 for i in 1:M)
 
 ##Make x equiv to allocation
