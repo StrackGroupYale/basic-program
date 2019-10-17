@@ -1,105 +1,83 @@
+#####################################
+# Proof of Concept Code #
+#####################################
+
+
 #import Pkg; Pkg.add("JuMP")
 #import Pkg; Pkg.add("Clp")
 using JuMP
 using Cbc
 
-# && (x => 0)
-#@variable(m, util[1:M,1:N] >= 0)
-#@variable(m, dist[1:M] >= 0)
-#@variable(m, 0 <= capacity[1:N])
-
 #Set M = 20
-M = 20 #rows
+T = 20 #rows, represents length of Theta
 #Set N = 10
-N = 10 #columns
+A = 10 #columns, represents length of A
 
-#Allocation Dataset
-alloc =
-[ [1 1 1 1 1 1 1 1 1 1];
-  [2 2 2 2 2 2 2 2 2 2];
-  [3 3 3 3 3 3 3 3 3 3];
-  [4 4 4 4 4 4 4 4 4 4];
-  [5 5 5 5 5 5 5 5 5 5];
-  [6 6 6 6 6 6 6 6 6 6];
-  [7 7 7 7 7 7 7 7 7 7];
-  [8 8 8 8 8 8 8 8 8 8];
-  [9 9 9 9 9 9 9 9 9 9];
-  [0 0 0 0 0 0 0 0 0 0];
-  [1 1 1 1 1 1 1 1 1 1];
-  [2 2 2 2 2 2 2 2 2 2];
-  [3 3 3 3 3 3 3 3 3 3];
-  [4 4 4 4 4 4 4 4 4 4];
-  [5 5 5 5 5 5 5 5 5 5];
-  [6 6 6 6 6 6 6 6 6 6];
-  [7 7 7 7 7 7 7 7 7 7];
-  [8 8 8 8 8 8 8 8 8 8];
-  [9 9 9 9 9 9 9 9 9 9];
-  [0 0 0 0 0 0 0 0 0 0];
-]
+#Distribution DataSet, f_\theta
+Dist_arr = Array{Float64}(undef, T)
+for i in 1:T
+    Dist_arr[i] = i^2
+end
 
-
+#Capacity DataSet c
+Cap_arr = Array{Float64}(undef,A)
+for j in 1:A
+    Cap_arr = 1
+end
 
 #Utility DataSet
-util =
-[ [ .003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-  [.003 .007 .003 .007 .003 .007 .003 .007 .003 .007];
-]
-
-#Distribution DataSet
-dist = [1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0]
-
-#Capacity DataSet
-capacity = [1 1 1 1 1 1 1 1 1 1]
-
-m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
-@variable(m, 0 <= x)
-
-max_ob = 1
-for j in 1:N
-    for i in 1:M
-        n_o = @objective(m, Max, sum(dist[i]*(sum(util[i,j])*alloc[i,j])))
-        if (n_o > max_ob)
-            global max_ob = n_o
-        else
-        end
+Util_arr = Array{Float64}(undef,T,A)
+for k in 1:T
+    for l in 1:A
+        Util_arr[k][l] = 1/(k*l)
     end
 end
-#@objective(m, Max, sum(dist[i](sum(util[i,j])*alloc[i,j] for j in 1:N) for i in 1:M))
 
+#Constraint vector for Capacity
+C_con = Array{Float64}(undef,A)
+#Constraint vector for Feasibility
+F_con = Array{Float64}(undef,T)
+#constraint vector for IC
+I_con = Array{Float64}(undef,T)
 
+m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
 
+@objective(m, Max, 0)
+for i in 1:A
+    @constraint(m, C_con[i],0 <= Cap_arr[i])
+end
+for i in 1:T
+    @constraint(m, F_con[i],0 <= 1)
+end
+for i in 1:T
+    @constraint(m, I_con[i], 0 => 0)
+end
 
-@constraint(m, (sum(util[1,1]*alloc[1,1]) - sum(util[1,1]*alloc[1,1])) >= 0)
-#@constraint(m, ( sum(util[1,j]*alloc[1,j] for j=1:M) - sum(util[i,2]*alloc[i,2] for i=1:N)) >= 0)
-#@constraint(m, ((sum(util[i,j]*alloc[i,j] for i=1:N) for j=1:M) - (sum(util[i,k]*alloc[i,k] for i=1:N) for k=1:M)) >= 0)
+#make Variable index
+var_ind = Array{Float64}(undef,T,A)
+for k in 1:T
+    for l in 1:A
+        var_ind[k][l] = 'a' * char(k) * 'b' * char(l)
+    end
+end
 
-#@constraint(m, sum(dist[i]*alloc[i,j] for j=1:20) <= capacity[j] for j=1:10)
-#@constraint(m, sum(alloc[i,j] for all j in 1:N) <= 1 for i in 1:M)
-
-##Make x equiv to allocation
-@constraint(m, x == (alloc[1,j] for j in 1:N))
-@constraint(m, x >= 0)
-
+##Make C,F constraints work first, then work on I
+for l in 1:T
+    for k in 1:A
+        @variable(m,0=< var_ind[k][l] =< 1, objective = Util_arr[k][l], inconstraints = [C_con[l]], coefficients = [Dist_arr[k]], inconstraints = [F_con[k]],coefficients = [1])
+    end
+end
 print(m)
-
 status = optimize!(m)
 
 println("Objective value: ", JuMP.objective_value(m))
+println("BOOM", check(x))
+
+
+
+
+
+
+
+#Allocation Dataset f_\theta
+##write a matrix to fill with optimized values
