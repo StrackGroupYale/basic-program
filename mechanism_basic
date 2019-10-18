@@ -9,75 +9,62 @@ using JuMP
 using Cbc
 
 #Set M = 20
-T = 20 #rows, represents length of Theta
+T = 3 #rows, represents length of Theta
 #Set N = 10
-A = 10 #columns, represents length of A
+A = 4 #columns, represents length of A
 
 #Distribution DataSet, f_\theta
-Dist_arr = Array{Float64}(undef, T)
+Dist_arr = Array{Float64}(undef, T,1)
 for i in 1:T
     Dist_arr[i] = i^2
 end
 
 #Capacity DataSet c
-Cap_arr = Array{Float64}(undef,A)
+Cap_arr = Array{Float64}(undef,1,A)
 for j in 1:A
     Cap_arr = 1
 end
 
 #Utility DataSet
-Util_arr = Array{Float64}(undef,T,A)
-for k in 1:T
-    for l in 1:A
-        Util_arr[k][l] = 1/(k*l)
+Util_arr = zeros(Float64,T,A)
+for k = 1:T
+    for l = 1:A
+        Util_arr[k,l] = 1/(k*l)
     end
 end
 
 #Constraint vector for Capacity
-C_con = Array{Float64}(undef,A)
+#C_con = Array{any}(undef,A)
 #Constraint vector for Feasibility
-F_con = Array{Float64}(undef,T)
+#F_con = Array{Float64}(undef,T)
 #constraint vector for IC
-I_con = Array{Float64}(undef,T)
+#I_con = Array{Float64}(undef,T)
 
 m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
 
-@objective(m, Max, 0)
-for i in 1:A
-    @constraint(m, C_con[i],0 <= Cap_arr[i])
-end
-for i in 1:T
-    @constraint(m, F_con[i],0 <= 1)
-end
-for i in 1:T
-    @constraint(m, I_con[i], 0 => 0)
-end
+#Alloc variable
+@variable(m, X[1:T,1:A])
 
-#make Variable index
-var_ind = Array{Float64}(undef,T,A)
-for k in 1:T
-    for l in 1:A
-        var_ind[k][l] = 'a' * char(k) * 'b' * char(l)
-    end
-end
 
-##Make C,F constraints work first, then work on I
-for l in 1:T
-    for k in 1:A
-        @variable(m,0=< var_ind[k][l] =< 1, objective = Util_arr[k][l], inconstraints = [C_con[l]], coefficients = [Dist_arr[k]], inconstraints = [F_con[k]],coefficients = [1])
-    end
-end
+#capacity constraints
+#@constraint(m, Ccon, broadcast(<=, Dist_arr*X, Cap_arr))
+
+@constraint(m, Ccon, transpose(Dist_arr)*X .<= Cap_arr)
+
+
+#feasibility constraints
+ones_T = ones(1,T)
+ones_A = ones(1,A)
+
+@constraint(m, Fcon, ones_T*X .<= 1)
+
+
+print("Sample",(transpose(X[1,:])*Util_arr[1,:]))
+
+@objective(m, Max, sum( Dist_arr[i]*(transpose(X[i,:])*Util_arr[i,:]) for i in 1:T))
+
+
 print(m)
 status = optimize!(m)
 
 println("Objective value: ", JuMP.objective_value(m))
-println("BOOM", check(x))
-
-
-
-
-
-
-
-#Allocation Dataset f_\theta
-##write a matrix to fill with optimized values
