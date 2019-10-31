@@ -1,4 +1,4 @@
-##This assumes symmetry (e.g. shock goes from [-5,5])
+##This assumes symmetry (e.g. shock goes from [-5,5], no skips)
 
 using Distributions
 function generate_distribution(shock) 
