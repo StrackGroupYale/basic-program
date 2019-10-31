@@ -12,22 +12,32 @@
 using JuMP
 using Cbc
 
-##Function Inputs: # types, utility vector, Distribution, # objects, quantity constraints
-function f(a,B,C,d,E)
 
-	T = a #rows, represents length of Theta
-	A = b #columns, represents length of A
+##Shock Function Utility vector, Number of shocks, First Shock, Inc
+function shocks(Util,shock)
+	s_Util = broadcast(+,Util,shock)
+	return s_Util
+end
 
-	#Utility DataSet 
-	Util_arr = reshape(B, (a,c) )
+
+
+##Mechanism Function
+##Function Inputs: # types, # objects, utility vector, Distribution, quantity constraints
+function mech_basic(num_types,num_objects,Util_vec,Dist_arr,Cap_Constraint_vec)
+
+	T = num_types #rows, represents length of Theta
+	A = num_objects #columns, represents length of A
+
+	#Reshape utility dataset
+	Util_arr = reshape(Util_vec, (T,A) )
 
 	m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
-
+	
 	#Alloc variable
 	@variable(m, X[1:T,1:A])
 
 	#capacity constraint
-	@constraint(m, Ccon, transpose(C)*X .<= D)
+	@constraint(m, Ccon, transpose(Dist_arr)*X .<= Cap_Constraint_vec)
 
 
 	#feasibility constraint
@@ -40,12 +50,11 @@ function f(a,B,C,d,E)
 	@constraint(m, con[i=1:T,j=1:T], sum( Util_arr[i,k]*X[i,k] for k in 1:A)-sum( Util_arr[j,k]*X[j,k] for k in 1:A)>= 0)
 
 	#objective
-	@objective(m, Max, sum( C[i]*(transpose(X[i,:])*Util_arr[i,:]) for i in 1:T))
+	@objective(m, Max, sum( Dist_arr[i]*(transpose(X[i,:])*Util_arr[i,:]) for i in 1:T))
 
-
-	print(m)
+	#print(m)
 	status = optimize!(m)
 
-	println("Objective value: ", JuMP.objective_value(m))
+	#println("Objective value: ", JuMP.objective_value(m))
   return JuMP.objective_value(m)
 end
