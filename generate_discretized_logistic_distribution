@@ -1,7 +1,7 @@
 using Distributions
 function generate_distribution(shock) 
     d= Logistic() ##create logistic function
-    len = (1/2)*(length(shock)-1) ##for example, if shock vector goes from -5 to 5, this will output 5
+    len = round(Int64,(1/2)*(length(shock)-1)) ##for example, if shock vector goes from -5 to 5, this will output 5
     store = zeros(length(shock)) ##initialize store
     for i in -len:len ##for all the possible shock values
         store[i+len+1] = pdf(d,i) #generate the probability density at that point
