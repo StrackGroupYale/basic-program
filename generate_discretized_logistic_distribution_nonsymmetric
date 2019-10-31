@@ -1,0 +1,18 @@
+##this does NOT assume symmetry
+
+using Distributions
+function generate_distribution_nonsym(shock) 
+    d= Logistic() ##create logistic function
+    minval = round(Int64,minimum(shock))##for example, if shock vector goes from -5 to 5, this will output 5
+    maxval = round(Int64, maximum(shock))
+    store = zeros(length(shock)) ##initialize store
+    for i in minval:maxval ##for all the possible shock values
+        store[i-minval+1] = pdf(d,i) #generate the probability density at that point
+    end
+    sumstore = sum(store) ##to normalize it
+
+    freq = zeros(length(shock))
+    for i in 1:length(store)
+        freq[i] = round(Int64,100*store[i]/sumstore) ##round it into integers, 100 is arbitrary
+    end
+end
