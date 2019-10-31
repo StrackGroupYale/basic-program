@@ -10,9 +10,10 @@ function gen_log(shock)
         store[i,2] = pdf(d,shock[i]) #generate the probability density at that point
         sumstore = sumstore+store[i,2]
     end
-    freq = zeros(length(shock))
+    freq = zeros(length(shock),2)
     for i in 1:size(store,1)
-        freq[i] = round(Int64,100*store[i,2]/sumstore) ##round it into integers, 100 is arbitrary
+        freq[i,1] = shock[i]
+        freq[i,2] = round(Int64,100*store[i,2]/sumstore) ##round it into integers, 100 is arbitrary
     end
     return freq
 end
