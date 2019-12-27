@@ -1,3 +1,8 @@
+######READREADREAD
+#Josh: Ephraim, could you work on the input_2_tuple function? Ideally the user would be able to just type in the number of means, 
+#each of the means, and either the scale factors or N/A (which would create the default factor of 1) which the function would
+#use to create the tuple that gets fed into the distribution generator
+
 #Inputs: num, means_vec
 #Output file: num_types,num_objects,Util_vec,Dist_arr,Cap_Constraint_vec
 
