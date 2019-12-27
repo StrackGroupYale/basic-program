@@ -1,6 +1,8 @@
 ############################
 #Generalized function
 ############################
+
+
 #3 objects (students)
 #Use discretized logistic distribution to determine type dist.
 #Shock regime: 0,1,2,...,10 shocks, should multiply number of types
@@ -14,10 +16,21 @@ using Cbc
 
 
 ##Shock Function Utility vector, Number of shocks, First Shock, Inc
+
+function inc_shock_gen(shock_num,shock_base,shock_inc)
+	shock = Vector{T}(float, n)
+	for i:shock_num
+		shock[i] = shock_base + shock_inc*(i-1)
+	end
+	return shock
+end
+
 function shocks(Util,shock)
 	s_Util = broadcast(+,Util,shock)
 	return s_Util
 end
+
+
 
 
 
