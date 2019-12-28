@@ -14,26 +14,6 @@
 using JuMP
 using Cbc
 
-
-##Shock Function Utility vector, Number of shocks, First Shock, Inc
-
-function inc_shock_gen(shock_num,shock_base,shock_inc)
-	shock = Vector{T}(float, n)
-	for i:shock_num
-		shock[i] = shock_base + shock_inc*(i-1)
-	end
-	return shock
-end
-
-function shocks(Util,shock)
-	s_Util = broadcast(+,Util,shock)
-	return s_Util
-end
-
-
-
-
-
 ##Mechanism Function
 ##Function Inputs: # types, # objects, utility vector, Distribution, quantity constraints
 function mech_basic(num_types,num_objects,Util_vec,Dist_arr,Cap_Constraint_vec)
