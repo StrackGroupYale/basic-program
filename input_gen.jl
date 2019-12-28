@@ -6,23 +6,6 @@ using CSV
 using DataFrames
 
 
-#Shock Regime
-
-function shock_gen_incr(shock_num,shock_base,shock_inc)
-	shock = Vector{T}(float, n)
-	for i in 1:shock_num
-		shock[i] = shock_base + shock_inc*(i-1)
-	end
-	return shock
-end
-
-#general 
-function shocks(Util,shock)
-	s_Util = broadcast(+,Util,shock)
-	return s_Util
-end
-
-
 #Logistic Distribution Generator
 function log_dist_gen(frm)
 	#find number of rows
@@ -31,16 +14,17 @@ function log_dist_gen(frm)
 	n = size(frm,2)
 	#logstic fxns
 	d = Array{T}(undef, m, n)
-	for (i in 1:n, isodd(i)==true) #only index over means
+	for (j in 1:n, isodd(i)==true) #only index over means
 		for i in 1:m
-			d[i]= Logistic(frm[i,n],frm[i,n+1]) ##create logistic function: mean, scale
+			d[i,j]= Logistic(frm[i,j],frm[i,j+1]) ##create logistic function: mean, scale
 		end
 	end
 	return d
 end
 		
 	
-#input file gen
+###input file gen
+
 function data_gen(file_util,file_dist,file_cap)
 	print("Do you wish to input data directly (or have you invoked using a CSV file)? Y or (N)")
 	if readline() == Y
@@ -72,6 +56,25 @@ function data_gen(file_util,file_dist,file_cap)
 	#Output file: num_types,num_objects,Util_df,Dist_df,Cap_Constraint_df
 	return (num_types,num_objects,util_dist,dist_dist,cap_dist)
 end
+
+
+####Shock Regime
+
+#Generate shock vector, given the length,base shock, and increment
+function shock_gen_incr(shock_len,shock_base,shock_inc)
+	shock = Vector{T}(float, n)
+	for i in 1:shock_len
+		shock[i] = shock_base + shock_inc*(i-1)
+	end
+	return shock
+end
+
+#generate shocked data
+function shocked(frm,shock)
+	#tbd
+end
+
+
 
 
 
