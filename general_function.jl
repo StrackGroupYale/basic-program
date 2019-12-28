@@ -47,7 +47,6 @@ function mech_basic(num_types,num_objects,Util_vec,Dist_arr,Cap_Constraint_vec)
 
 	#print(m)
 	status = optimize!(m)
-
-	#println("Objective value: ", JuMP.objective_value(m))
-  return JuMP.objective_value(m)
+	
+  return ("info, time: ", JuMP.objective_value(m), @time JuMP.objective_value(m))
 end
