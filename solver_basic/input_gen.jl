@@ -1,4 +1,4 @@
-##Debugged
+#Debugged
 
 ###input utility value of schools, potential shocks, distribution of shocks (agent types), capacity, distances,
 
@@ -36,7 +36,7 @@ function data_gen(utility_means,shocks,shock_distribution,capacities)
 	frm_shocks = DataFrame(CSV.File(shocks))
 	frm_cap = DataFrame(CSV.File(capacities))
 
-	num_types = nrow(frm_util)*ncol(frm_shocks) #assuming shocks given with objects in row, each vector as a column
+	num_types = ncol(frm_shocks) #assuming shocks given with objects in row, each vector as a column
 	num_objects = nrow(frm_util)
 
 	#convert dataframe to matrix
@@ -84,7 +84,15 @@ function data_gen(utility_means,shocks,shock_distribution,capacities)
 	end
 	total2 = sum(type_probs)
 
-	##re-normalize, given actual
+	##generate total distribution
+	Dist_arr = Array{Float64}(undef, nrow(frm_shocks),ncol(frm_shocks))
+	for i in 1:1:ncol(frm_shocks)
+		for j in 1:nrow(frm_shocks)
+			Dist_arr[j,i] = quantile_probs[Int(shocks_arr2[i][j]*100)]
+		end
+	end
+
+	##re-normalize vector distr, given actual
 	for i in 1:ncol(frm_shocks)
 		type_probs[i] = type_probs[i]/total2
 	end
@@ -94,5 +102,5 @@ function data_gen(utility_means,shocks,shock_distribution,capacities)
 	for i in 1:ncol(frm_shocks)
 		type_vec2[i] = broadcast(+,util_arr1,shocks_arr2[i])
 	end
-	return (num_types,num_objects,type_vec2,type_probs,cap_vec)
+	return (num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_arr)
 end
