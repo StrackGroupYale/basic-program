@@ -73,6 +73,9 @@ function mech_basic_cbc(num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_
 
 	@constraint(m, Fcon, ones_T*X .<= 1)
 
+	#non-negativity constraint
+	@constraint(m, ncon, X .>= 0)
+
 	#IC constraint
 	@constraint(m, con[i=1:T,j=1:T], sum( type_arr[i,k]*X[i,k] for k in 1:A)-sum( type_arr[j,k]*X[j,k] for k in 1:A)>= 0)
 
@@ -82,9 +85,15 @@ function mech_basic_cbc(num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_
 	#print(m)
 	status = optimize!(m)
 
-	#j = MOI.get(Cbc.Optimizer, VariablePrimal(), X)
+	#find argmax
+	assignment_arr = Array{Float64}(undef, num_types,num_objects)
+	for i in 1:num_types
+		for j in 1:num_objects
+	 		assignment_arr[i,j] = MOI.get(m, MOI.VariablePrimal(),X[i,j])
+		end
+	end
 
-  return (status,j)
+  return (assignment_arr)
 end
 
 #fix
