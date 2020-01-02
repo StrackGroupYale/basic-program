@@ -79,8 +79,8 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 end
 
 
-
-function compos_cbc(utility_means,shocks,shock_distribution,capacities)
+#create and solve problem
+function problem_cs(utility_means,shocks,shock_distribution,capacities)
 	in = data_gen(utility_means,shocks,shock_distribution,capacities)
 	out = mech_basic_cbc(in[1],in[2],in[3],in[4],in[5])
 	return out
@@ -103,7 +103,7 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 			seed1 = seed1*scale_factor^i
 			seed2 = seed2*scale_factor^i
 			#run
-			d = compos_cbc("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$seed1,$seed2.csv",
+			d = problem_cs("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$seed1,$seed2.csv",
 				   	   "/Users/joshuapurtell/Desktop/Strack_Project/data/shock_data@$seed1,$seed2.csv",
 				       "logistic",
 				       "/Users/joshuapurtell/Desktop/Strack_Project/data/cap_data@$seed1,$seed2.csv"
