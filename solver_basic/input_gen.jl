@@ -1,49 +1,66 @@
+##Debugged
+
+###input utility value of schools, potential shocks, distribution of shocks (agent types), capacity, distances,
+
+###output mech_basic(num_types,num_objects,type_arr,distribution_arr,capacity_vec)
+
 using Distributions
 using JuMP
 using CSV
 using DataFrames
 
+###input file gen
 
-### finds pdf at a quantile for given distribution
+###credit to Iain Dunning
+function expandgrid(args...)
+    if length(args) == 0
+        return Any[]
+    elseif length(args) == 1
+        return args[1]
+    else
+        rest = expandgrid(args[2:end]...)
+        ret  = Any[]
+        for i in args[1]
+            for r in rest
+                push!(ret, vcat(i,r))
+            end
+        end
+        return ret
+    end
+end
 
 function quantile_prob_finder(distribution, quant)
-	p = 0.0
+	d = 0.0
 	if (distribution == "logistic")
-		p = pdf(Logistic(),quantile(Logistic(),quant*(0.01)))
+		d = pdf(Logistic(),quantile(Logistic(),quant*(0.01)))
 	elseif (distribution == "uniform")
-		p = pdf(Logistic(),quantile(Uniform(),quant*(0.01)))
-	##Further support can be added if needed
+		d = pdf(Uniform(),quantile(Uniform(),quant*(0.01)))
 	else
 		printline("Error: distribution type not supported")
 	end
-	return p
+	return d
 end
 
 
-function data_gen(utility_means,shocks,shock_distribution,capacities)
+function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
 
 	#covert information to dataframe
 	frm_util = DataFrame(CSV.File(utility_means))
 	frm_shocks = DataFrame(CSV.File(shocks))
 	frm_cap = DataFrame(CSV.File(capacities))
-	
-	#determine number of types
-	num_types = ncol(frm_shocks) #assuming shocks given with objects in row, each vector as a column
+
+	num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
 	num_objects = nrow(frm_util)
 
 	#convert dataframe to matrix
-	util_arr1 = Vector{Float64}(undef, nrow(frm_util))
+	util_vec = Vector{Float64}(undef, nrow(frm_util))
 	for i in 1:nrow(frm_util)
-		util_arr1[i] = frm_util.mean[i]
+		util_vec[i] = frm_util.mean[i]
 	end
 
-	shocks_arr2 = Vector{Any}(undef, ncol(frm_shocks))
-	for i in 1:ncol(frm_shocks)
-		shockvec = Vector{Float64}(undef, nrow(frm_shocks))
-		for j in 1:nrow(frm_shocks)
-			shockvec[j]= frm_shocks[:,i][j]
-		end
-		shocks_arr2[i] = shockvec
+	shock_vec = Vector{Float64}(undef, nrow(frm_shocks))
+	for i in 1:nrow(frm_shocks)
+		shock_vec[i] = frm_shocks.shock[i]
 	end
 
 	cap_vec = Vector{Float64}(undef, nrow(frm_cap))
@@ -51,7 +68,22 @@ function data_gen(utility_means,shocks,shock_distribution,capacities)
 		cap_vec[i] = frm_cap.cap[i]
 	end
 
-	##find object shock probabilities, for discrete whole-number quantiles (assume independence across objects)
+	##Find all type vector permutations
+
+	#Vector of vectors should be size nrow(frm_shocks)^nrow(frm_util)
+	
+	#create nrow(frm_util)-length array of shock vectors
+	reshape_arr = Vector{Any}(undef, nrow(frm_util))
+	for i in 1:nrow(frm_util)
+		reshape_arr[i] = shock_vec
+	end
+	expanded = expandgrid(reshape_arr...)
+
+	type_vector = reshape(expanded,(num_types,1))
+
+	##assume independence across objects
+
+	##find object shock probabilities, for discrete whole-number quantiles
 	quantile_probs = Vector{Any}(undef, 100)
 	for i in 1:100
 		quantile_probs[i] = quantile_prob_finder(shock_distribution,i)
@@ -62,35 +94,37 @@ function data_gen(utility_means,shocks,shock_distribution,capacities)
 	for i in 1:100
 		quantile_probs[i] = quantile_probs[i]/total
 	end
-
-	##generate distribution for types/shock vectors
-	type_probs = Vector{Float64}(undef, ncol(frm_shocks))
-	for i in 1:ncol(frm_shocks)
+	
+	##generate distribution for shock vectors
+	type_probs = Vector{Float64}(undef, num_types)
+	for i in 1:(nrow(frm_shocks)^nrow(frm_util))
 		prob = 1
-		for j in 1:nrow(frm_shocks)
-			prob = prob*quantile_probs[Int(shocks_arr2[i][j]*100)]
+		for j in 1:nrow(frm_util)
+			prob = prob*quantile_probs[Int(type_vector[i][j]*100)]
 		end
 		type_probs[i] = prob
 	end
 	total2 = sum(type_probs)
-	
+
 	##re-normalize vector distr, given actual
-	for i in 1:ncol(frm_shocks)
+	for i in 1:nrow(frm_shocks)
 		type_probs[i] = type_probs[i]/total2
 	end
 
-	##generate total distribution
-	Dist_arr = Array{Float64}(undef, nrow(frm_shocks),ncol(frm_shocks))
-	for i in 1:1:ncol(frm_shocks)
-		for j in 1:nrow(frm_shocks)
-			Dist_arr[j,i] = quantile_probs[Int(shocks_arr2[i][j]*100)]
+	##generate types
+	type_vec2 = Vector{Any}(undef, num_types)
+	for i in 1:num_types
+		type_vec2[i] = broadcast(+,util_vec,type_vector[i])
+	end
+
+	#generate type_arr
+	type_arr = Array{Float64}(undef, num_types,num_objects)
+	for i in 1:num_types
+		for j in 1:num_objects
+			type_arr[i,j] = type_vec2[i][j]
 		end
 	end
 
-	##generate types
-	type_vec2 = Vector{Any}(undef, ncol(frm_shocks))
-	for i in 1:ncol(frm_shocks)
-		type_vec2[i] = broadcast(+,util_arr1,shocks_arr2[i])
-	end
-	return (num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_arr)
+
+	return (num_types,num_objects,type_arr,type_probs,cap_vec)
 end
