@@ -6,6 +6,6 @@ To implement this example, please do as follows:
       include("directory path from step 1/pkgs2add.jl")
       include("directory path from step 1/problem_generator.jl")
       include("directory path from step 1/problem_solver.jl")
-      compos("directory path from step 1/util_data.csv","directory path from step 1/shock_data.csv","logistic","directory path       from step 1/cap_data.csv")
-By inputing "logistic", you are choosing a logistic distribution. "compos" is a function which composes the problem            solver and generator functions.
+      problem_cs("directory path from step 1/util_data.csv","directory path from step 1/shock_data.csv","logistic","directory path       from step 1/cap_data.csv")
+By inputing "logistic", you are choosing a logistic distribution. "problem_cs" is a function which composes the problem        solver and generator functions.
 5) The assignment array should appear as output, but feel free to check "directory path from step 1/assignment_data/file name for the destination of the optimal assignment data" to make sure that the array was written, as intended.
