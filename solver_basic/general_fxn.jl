@@ -8,46 +8,62 @@ using Cbc
 using MathOptInterface
 const MOI = MathOptInterface
 
-###Problem Solver###
+#Vectorization
 
-function mech_basic_cbc(num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_arr)
+function df2vec(df,dimlen)
+	vec = Array{Float64}(undef, dimlen)
+	for i in 1:dimlen
+		vec[i] = df[i,1]
+	end
+	return vec
+end
 
-	##generate type_arr
-	type_arr = Array{Float64}(undef, num_types,num_objects)
-	for i in 1:num_types
-		for j in 1:num_objects
-			type_arr[i,j] = type_vec2[i][j]
+function df2arr(df,dim1len,dim2len)
+	arr = Array{Float64}(undef, dim1len, dim2len)
+	for i in 1:dim1len
+		for j in 1:dim2len
+			arr[i,j] = df[i,j]
 		end
 	end
-	
+	return arr
+end
+
+function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
+
+	#turn cap_vec into an array
+	#otherwise solver bricks, don't use 0-dim or vector
+
+	cap_arr = Matrix{Float64}(undef,1,num_objects)
+	for i in 1:num_objects
+		cap_arr[i] = cap_vec[i]
+	end
+
+
 	T = num_types #rows, represents length of Theta
 	A = num_objects #columns, represents length of A
 
-	##make model
 	m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
 
 	#Alloc variable
 	@variable(m, X[1:T,1:A])
-	
-	##Constraints
+
 	#capacity constraint
-	@constraint(m, Ccon, Dist_arr*X .<= cap_vec)
+	@constraint(m, Ccon, transpose(type_probs)*X .<= cap_arr)
 
 	#feasibility constraint
 	ones_T = ones(1,T)
 	ones_A = ones(1,A)
-	@constraint(m, Fcon, ones_T*X .<= 1)
+	@constraint(m, Fcon, ones_T*X .<= ones_A)
 
 	#non-negativity constraint
 	@constraint(m, ncon, X .>= 0)
 
-	#IC constraint
-	@constraint(m, con[i=1:T,j=1:T], sum( type_arr[i,k]*X[i,k] for k in 1:A)-sum( type_arr[j,k]*X[j,k] for k in 1:A)>= 0)
+	#Incentive Compatibility constraint
+	@constraint(m, con[i=1:T,j=1:T], sum( type_arr[i,k]*X[i,k] for k in 1:A)-sum( type_arr[i,k]*X[j,k] for k in 1:A)>= 0)
 
-	##objective
-	@objective(m, Max, sum( Dist_arr[i]*(transpose(X[i,:])*type_arr[i,:]) for i in 1:T))
+	#objective
+	@objective(m, Max, sum( transpose(type_probs[i])*(transpose(X[i,:])*type_arr[i,:]) for i in 1:T))
 
-	#print solved model
 	status = optimize!(m)
 
 	#find argmax
@@ -57,14 +73,41 @@ function mech_basic_cbc(num_types,num_objects,type_vec2,type_probs,cap_vec,Dist_
 	 		assignment_arr[i,j] = MOI.get(m, MOI.VariablePrimal(),X[i,j])
 		end
 	end
-
-  	return (assignment_arr)
+	k = sum(assignment_arr)
+	CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+  return (assignment_arr)
 end
 
-###Compose problem generator and solver###
+
 
 function compos_cbc(utility_means,shocks,shock_distribution,capacities)
 	in = data_gen(utility_means,shocks,shock_distribution,capacities)
-	out = mech_basic_cbc(in[1],in[2],in[3],in[4],in[5],in[6])
+	out = mech_basic_cbc(in[1],in[2],in[3],in[4],in[5])
 	return out
+end
+
+
+function create_data(seed1,seed2,scale_factor,num_iterations)
+	for i in 1:num_iterations
+		println("working")
+		seed1 = seed1*scale_factor^i
+		seed2 = seed2*scale_factor^i
+		dummy_gen(seed1,seed2)
+	end
+end
+
+function time_test(seed1,seed2,scale_factor,num_iterations)
+	store_arr = Array{Any}(undef, num_iterations)
+	for i in 1:num_iterations
+			println("I'm working!")
+			seed1 = seed1*scale_factor^i
+			seed2 = seed2*scale_factor^i
+			#run
+			d = compos_cbc("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$seed1,$seed2.csv",
+				   	   "/Users/joshuapurtell/Desktop/Strack_Project/data/shock_data@$seed1,$seed2.csv",
+				       "logistic",
+				       "/Users/joshuapurtell/Desktop/Strack_Project/data/cap_data@$seed1,$seed2.csv"
+				       )
+			@time d
+	end
 end
