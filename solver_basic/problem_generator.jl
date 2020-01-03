@@ -1,5 +1,5 @@
 ###################
-#= File the creates three functions: expandgrid (credit Iain Dunning), quantile_prob_finder, data_gen. 
+#= File the creates three functions: expandgrid (credit Iain Dunning), quantile_prob_finder, data_gen.
 expandgrid:
 quantile_prob_finder:
 data_gen:
@@ -76,7 +76,7 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 	##Find all type vector permutations
 
 	#Vector of vectors should be size nrow(frm_shocks)^nrow(frm_util)
-	
+
 	#create nrow(frm_util)-length array of shock vectors
 	reshape_arr = Vector{Any}(undef, nrow(frm_util))
 	for i in 1:nrow(frm_util)
@@ -99,7 +99,7 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 	for i in 1:100
 		quantile_probs[i] = quantile_probs[i]/total
 	end
-	
+
 	##generate distribution for shock vectors
 	type_probs = Vector{Float64}(undef, num_types)
 	for i in 1:(nrow(frm_shocks)^nrow(frm_util))
