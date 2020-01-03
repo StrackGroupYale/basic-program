@@ -1,8 +1,9 @@
-##Debugged
-
-###input utility value of schools, potential shocks, distribution of shocks (agent types), capacity, distances,
-
-###output mech_basic(num_types,num_objects,type_arr,distribution_arr,capacity_vec)
+###################
+#= File the creates three functions: expandgrid (credit Iain Dunning), quantile_prob_finder, data_gen. 
+expandgrid:
+quantile_prob_finder:
+data_gen:
+=#
 
 using Distributions
 using JuMP
