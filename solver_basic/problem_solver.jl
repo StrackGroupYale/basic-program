@@ -83,9 +83,9 @@ end
 
 #create and solve problem
 function problem_cs(utility_means,shocks,shock_distribution,capacities)
-	in = data_gen(utility_means,shocks,shock_distribution,capacities)
-	out = mech_basic_cbc(in[1],in[2],in[3],in[4],in[5])
-	return out
+	inpu = data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	return outpu
 end
 
 
