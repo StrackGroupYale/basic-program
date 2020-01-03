@@ -1,3 +1,5 @@
+module CSV_gen
+
 using CSV
 using DataFrames
 
@@ -43,3 +45,5 @@ function dummy_gen(num_objects,num_typevec)
     CSV.write("~./dummy_data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
 
 end
+
+end #module
