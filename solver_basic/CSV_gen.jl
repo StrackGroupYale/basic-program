@@ -41,6 +41,5 @@ function dummy_gen(num_objects,num_typevec)
     CSV.write("~./dummy_data/util_data@$num_objects,$num_typevec.csv", M[1], writeheader=false)
     CSV.write("~./dummy_data/shock_data@$num_objects,$num_typevec.csv", M[2], writeheader=false)
     CSV.write("~./dummy_data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
-end
 
 end
