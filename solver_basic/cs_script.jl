@@ -1,3 +1,5 @@
+push!(LOAD_PATH, "/Users/joshuapurtell/Documents/GitHub/basic-program/solver_basic")
+
 using problem_generator
 using problem_solver
 using CSV_gen
