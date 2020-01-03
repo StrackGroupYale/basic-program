@@ -4,6 +4,7 @@
 
 module problem_solver
 
+export mech_basic_cbc, problem_cs
 using JuMP
 using Cbc
 
