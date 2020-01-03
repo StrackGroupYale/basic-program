@@ -74,7 +74,9 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 		end
 	end
 	k = sum(assignment_arr)
-	CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+	#CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+	#current directory to allow for generalization
+	CSV.write("./assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
   return (assignment_arr)
 end
 
