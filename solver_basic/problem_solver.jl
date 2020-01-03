@@ -2,7 +2,7 @@
 #Generalized function
 ############################
 
-module problem_solver.jl
+module problem_solver
 
 using JuMP
 using Cbc
