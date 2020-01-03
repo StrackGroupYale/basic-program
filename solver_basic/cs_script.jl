@@ -1,4 +1,5 @@
-push!(LOAD_PATH, "/Users/joshuapurtell/Documents/GitHub/basic-program/solver_basic")
+push!(LOAD_PATH, "~./basic-program/solver_basic")
+println(LOAD_PATH)
 
 using problem_generator
 using problem_solver
