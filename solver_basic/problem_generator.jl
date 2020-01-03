@@ -6,6 +6,8 @@ data_gen:
 =#
 module problem_generator
 
+export data_gen
+
 
 using Distributions
 using JuMP
