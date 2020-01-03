@@ -2,6 +2,8 @@
 #Generalized function
 ############################
 
+module problem_solver.jl
+
 using JuMP
 using Cbc
 
@@ -115,3 +117,4 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 			@time d
 	end
 end
+end #module
