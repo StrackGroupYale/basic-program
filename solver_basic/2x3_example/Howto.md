@@ -7,7 +7,8 @@ To implement, please do as follows:
 3) input: julia path/basic_program/solver_basic/problem_generator.jl
 4) input: julia path/basic_program/solver_basic/problem_solver.jl
 5) input: julia path/basic_program/solver_basic/CSV_gen.jl
-6) input: julia problem_cs("path/basic_program/solver_basic/2x3_example/util_data.csv","path/basic_program/solver_basic/2x3_example/shock_data.csv","logistic","path/basic_program/solver_basic/2x3_example/cap_data.csv")
+###DEBUGGING
+6) input: path/basic_program/solver_basic/julia cs_script.jl
 7) Check path/basic_program/solver_basic/assignment_data for output
 
 
