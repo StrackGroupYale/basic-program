@@ -2,14 +2,14 @@
 
 FAVORED APPROACH
 To implement, please do as follows:
-1) Clone the entire repository to your local machine. Observe the path to the "solver_basic" directory. This path shall be henceforth referred to as "path"
-2) input: julia path/basic_program/solver_basic/pkgs2add.jl
-3) input: julia path/basic_program/solver_basic/problem_generator.jl
-4) input: julia path/basic_program/solver_basic/problem_solver.jl
-5) input: julia path/basic_program/solver_basic/CSV_gen.jl
-###DEBUGGING
-6) input: path/basic_program/solver_basic/julia cs_script.jl
-7) Check path/basic_program/solver_basic/assignment_data for output
+1) Clone the entire repository to your local machine.
+2) cd to your Github directory, possibly by cd /Users/Name/Documents/Github
+3) input: julia basic_program/solver_basic/pkgs2add.jl
+4) input: julia basic_program/solver_basic/problem_generator.jl
+5) input: julia basic_program/solver_basic/problem_solver.jl
+6) input: julia basic_program/solver_basic/CSV_gen.jl
+7) input: path/basic_program/solver_basic/julia cs_script.jl
+8) Check path/basic_program/solver_basic/assignment_data for output
 
 
 
