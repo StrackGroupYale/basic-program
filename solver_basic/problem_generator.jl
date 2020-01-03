@@ -4,6 +4,8 @@ expandgrid:
 quantile_prob_finder:
 data_gen:
 =#
+module problem_generator
+
 
 using Distributions
 using JuMP
@@ -129,3 +131,5 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 
 	return (num_types,num_objects,type_arr,type_probs,cap_vec)
 end
+
+end #module
