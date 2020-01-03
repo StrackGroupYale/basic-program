@@ -117,11 +117,12 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 			@time d
 	end
 end
+#=
 problem_cs("~./basic_program/solver_basic/2x3_example/util_data.csv",
            "~./basic_program/solver_basic/2x3_example/shock_data.csv",
            "logistic",
            "~./basic_program/solver_basic/2x3_example/cap_data.csv")
-
+=#
 
 
 end #module
