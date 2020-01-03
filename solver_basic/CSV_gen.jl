@@ -34,7 +34,13 @@ end
 function dummy_gen(num_objects,num_typevec)
     M = df_gen(num_objects,num_typevec)
     #Write into file
-    CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$num_objects,$num_typevec.csv", M[1], writeheader=false)
-    CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/shock_data@$num_objects,$num_typevec.csv", M[2], writeheader=false)
-    CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
+    #CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$num_objects,$num_typevec.csv", M[1], writeheader=false)
+    #CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/shock_data@$num_objects,$num_typevec.csv", M[2], writeheader=false)
+    #CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
+    
+    CSV.write("~./dummy_data/util_data@$num_objects,$num_typevec.csv", M[1], writeheader=false)
+    CSV.write("~./dummy_data/shock_data@$num_objects,$num_typevec.csv", M[2], writeheader=false)
+    CSV.write("~./dummy_data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
+end
+
 end
