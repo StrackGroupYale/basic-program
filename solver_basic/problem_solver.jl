@@ -4,12 +4,19 @@
 
 module problem_solver
 
+push!(LOAD_PATH, "basic-program/solver_basic")
+
 export mech_basic_cbc, problem_cs
+
+using problem_generator
+
 using JuMP
 using Cbc
 
 using MathOptInterface
 const MOI = MathOptInterface
+using DataFrames
+using CSV
 
 #Vectorization
 
@@ -76,17 +83,20 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 	 		assignment_arr[i,j] = MOI.get(m, MOI.VariablePrimal(),X[i,j])
 		end
 	end
+
+	#turn assignment_arr into a dataframe
+
 	k = sum(assignment_arr)
 	#CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
 	#current directory to allow for generalization
-	CSV.write("./assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+	CSV.write("basic-program/solver_basic/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
   return (assignment_arr)
 end
 
 
 #create and solve problem
 function problem_cs(utility_means,shocks,shock_distribution,capacities)
-	inpu = data_gen(utility_means,shocks,shock_distribution,capacities)
+	inpu = problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
 	outpu = mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
 	return outpu
 end
@@ -110,20 +120,13 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 			seed1 = seed1*scale_factor^i
 			seed2 = seed2*scale_factor^i
 			#run
-			d = problem_cs("~./dummy_data/util_data@$seed1,$seed2.csv",
-				   	   "~./dummy_data/shock_data@$seed1,$seed2.csv",
+			d = problem_cs("basic-program/solver_basic/dummy_data/util_data@$seed1,$seed2.csv",
+				   	   "basic-program/solver_basic/dummy_data/shock_data@$seed1,$seed2.csv",
 				       "logistic",
-				       "~./dummy_data/cap_data@$seed1,$seed2.csv"
+				       "basic-program/solver_basic/dummy_data/cap_data@$seed1,$seed2.csv"
 				       )
 			@time d
 	end
 end
-#=
-problem_cs("~./basic_program/solver_basic/2x3_example/util_data.csv",
-           "~./basic_program/solver_basic/2x3_example/shock_data.csv",
-           "logistic",
-           "~./basic_program/solver_basic/2x3_example/cap_data.csv")
-=#
-
 
 end #module
