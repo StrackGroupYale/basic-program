@@ -89,6 +89,8 @@ function problem_cs(utility_means,shocks,shock_distribution,capacities)
 end
 
 
+###UPDATE timing regime
+
 function create_data(seed1,seed2,scale_factor,num_iterations)
 	for i in 1:num_iterations
 		println("working")
@@ -105,10 +107,10 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 			seed1 = seed1*scale_factor^i
 			seed2 = seed2*scale_factor^i
 			#run
-			d = problem_cs("/Users/joshuapurtell/Desktop/Strack_Project/data/util_data@$seed1,$seed2.csv",
-				   	   "/Users/joshuapurtell/Desktop/Strack_Project/data/shock_data@$seed1,$seed2.csv",
+			d = problem_cs("~./dummy_data/util_data@$seed1,$seed2.csv",
+				   	   "~./dummy_data/shock_data@$seed1,$seed2.csv",
 				       "logistic",
-				       "/Users/joshuapurtell/Desktop/Strack_Project/data/cap_data@$seed1,$seed2.csv"
+				       "~./dummy_data/cap_data@$seed1,$seed2.csv"
 				       )
 			@time d
 	end
