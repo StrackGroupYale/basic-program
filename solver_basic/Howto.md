@@ -16,5 +16,5 @@ julia basic-program/solver_basic/pkgs2add.jl <br/>
 julia basic-program/solver_basic/problem_generator.jl <br/>
 julia basic-program/solver_basic/problem_solver.jl <br/>
 julia basic-program/solver_basic/CSV_gen.jl <br/>
-julia basic-program/solver_basic/2x3_example/cs_script.jl <br/>
+julia basic-program/solver_basic/gen_cs_script.jl <br/>
 5) Check basic-program/solver_basic/assignment_data for output
