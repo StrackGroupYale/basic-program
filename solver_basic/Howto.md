@@ -3,18 +3,18 @@ please refer to the proper "2x3_example" subdirectory for the correct Howto.md f
 
 To implement, please do as follows:
 
-Clone the entire repository to your local machine.
-cd to your Github directory, possibly by cd /Users/Name/Documents/Github
+1) Clone the entire repository to your local machine.
+2) cd to your Github directory, possibly by cd /Users/Name/Documents/Github
 
-If they are not already present, move files of the following name to this directory:
-util_data.csv
-shock_data.csv
+3) If they are not already present, move files of the following name to this directory: <br/>
+util_data.csv <br/>
+shock_data.csv <br/>
 cap_data.csv
 
-input the following commands:
-julia basic-program/solver_basic/pkgs2add.jl
-julia basic-program/solver_basic/problem_generator.jl
-julia basic-program/solver_basic/problem_solver.jl
-julia basic-program/solver_basic/CSV_gen.jl
-julia basic-program/solver_basic/2x3_example/cs_script.jl
-Check basic-program/solver_basic/assignment_data for output
+4) Input the following commands:<br/>
+julia basic-program/solver_basic/pkgs2add.jl <br/>
+julia basic-program/solver_basic/problem_generator.jl <br/>
+julia basic-program/solver_basic/problem_solver.jl <br/>
+julia basic-program/solver_basic/CSV_gen.jl <br/>
+julia basic-program/solver_basic/2x3_example/cs_script.jl <br/>
+5) Check basic-program/solver_basic/assignment_data for output
