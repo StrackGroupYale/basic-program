@@ -146,7 +146,10 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 	d = (num_types,num_objects,type_arr,type_probs,cap_vec)
 	
 	if write ==1
-		CSV.write("$6", DataFrame(d), writeheader=false)
+		#CSV.write("$6", DataFrame(d), writeheader=false)
+		#May be deprecated, if so use above as backup
+		name = chomp($6)
+		writedlm("$name", d)
 	end
 	
 	return (num_types,num_objects,type_arr,type_probs,cap_vec)
