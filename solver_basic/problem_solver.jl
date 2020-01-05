@@ -3,41 +3,20 @@
 ############################
 
 module problem_solver
+export mech_basic_cbc
 
-push!(LOAD_PATH, "basic-program/solver_basic")
-
-export mech_basic_cbc, problem_cs
-
-using problem_generator
 
 using JuMP
 using Cbc
-
-using MathOptInterface
-const MOI = MathOptInterface
 using DataFrames
 using CSV
 
-#Vectorization
+using MathOptInterface
+const MOI = MathOptInterface
 
-function df2vec(df,dimlen)
-	vec = Array{Float64}(undef, dimlen)
-	for i in 1:dimlen
-		vec[i] = df[i,1]
-	end
-	return vec
-end
 
-function df2arr(df,dim1len,dim2len)
-	arr = Array{Float64}(undef, dim1len, dim2len)
-	for i in 1:dim1len
-		for j in 1:dim2len
-			arr[i,j] = df[i,j]
-		end
-	end
-	return arr
-end
-
+#takes the number of types, number of objects, array of types, array of probabilities, and capacity vector and finds
+#solution
 function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 
 	#turn cap_vec into an array
@@ -87,46 +66,9 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 	#turn assignment_arr into a dataframe
 
 	k = sum(assignment_arr)
-	#CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
 	#current directory to allow for generalization
 	CSV.write("basic-program/solver_basic/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
   return (assignment_arr)
-end
-
-
-#create and solve problem
-function problem_cs(utility_means,shocks,shock_distribution,capacities)
-	inpu = problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
-	outpu = mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
-	return outpu
-end
-
-
-###UPDATE timing regime
-
-function create_data(seed1,seed2,scale_factor,num_iterations)
-	for i in 1:num_iterations
-		println("working")
-		seed1 = seed1*scale_factor^i
-		seed2 = seed2*scale_factor^i
-		dummy_gen(seed1,seed2)
-	end
-end
-
-function time_test(seed1,seed2,scale_factor,num_iterations)
-	store_arr = Array{Any}(undef, num_iterations)
-	for i in 1:num_iterations
-			println("I'm working!")
-			seed1 = seed1*scale_factor^i
-			seed2 = seed2*scale_factor^i
-			#run
-			d = problem_cs("basic-program/solver_basic/dummy_data/util_data@$seed1,$seed2.csv",
-				   	   "basic-program/solver_basic/dummy_data/shock_data@$seed1,$seed2.csv",
-				       "logistic",
-				       "basic-program/solver_basic/dummy_data/cap_data@$seed1,$seed2.csv"
-				       )
-			@time d
-	end
 end
 
 end #module
