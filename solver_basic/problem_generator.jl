@@ -48,7 +48,20 @@ end
 
 
 function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
-
+	
+	##If command-line arguments are given, accept them
+	#determines whether to write into file later
+	write = 0
+	if $1 == "cmd"
+		write = 1
+		utility_means = $2
+		shocks = $3
+		shock_distribution = $4
+		capacities = $5
+		#sixth argument is name of file to which results are written
+	end	
+	
+	
 	#covert information to dataframe
 	frm_util = DataFrame(CSV.File(utility_means))
 	frm_shocks = DataFrame(CSV.File(shocks))
@@ -129,8 +142,13 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 			type_arr[i,j] = type_vec2[i][j]
 		end
 	end
-
-
+	
+	d = (num_types,num_objects,type_arr,type_probs,cap_vec)
+	
+	if write ==1
+		CSV.write("$6", DataFrame(d), writeheader=false)
+	end
+	
 	return (num_types,num_objects,type_arr,type_probs,cap_vec)
 end
 
