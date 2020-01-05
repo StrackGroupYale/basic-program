@@ -6,7 +6,7 @@ To implement, please do as follows:
 1) Clone the entire repository to your local machine.
 2) cd to your Github directory, possibly by cd /Users/Name/Documents/Github
 
-Now, there are two different methods of inputing data to this function. One is to use the command line directly. The other, is to use a script.
+Now, there are two different methods of inputing data to this function. One (I) is to use the command line directly. The other (II) is to use a script.
 
 I: Using the Command-Line<br/>
 3a) Input the following commands:<br/>
