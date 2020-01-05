@@ -18,7 +18,17 @@ const MOI = MathOptInterface
 #takes the number of types, number of objects, array of types, array of probabilities, and capacity vector and finds
 #solution
 function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
-
+	
+	#check if command-line arguments are desired
+	if $1 == "cmd"
+		d = readdlm($2)
+		num_types = d[1]
+		num_objects = d[2]
+		type_arr = d[3]
+		type_probs=d[4]
+		cap_vec=d[5]
+	end
+	
 	#turn cap_vec into an array
 	#otherwise solver bricks, don't use 0-dim or vector
 
