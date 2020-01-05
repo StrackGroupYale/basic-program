@@ -3,10 +3,10 @@ println(LOAD_PATH)
 
 using problem_generator
 using problem_solver
-using CSV_gen
+using exec_and_time
 
 #uses files saved in directory where clone was saved
-problem_solver.problem_cs("util_data.csv",
+exec_and_time.problem_cs("util_data.csv",
            "shock_data.csv",
            "logistic",
            "cap_data.csv")
