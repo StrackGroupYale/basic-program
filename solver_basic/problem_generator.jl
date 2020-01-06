@@ -166,5 +166,4 @@ end
 if (ARGS[1]=="cmd")
     data_gen_cmd()
 end
-
 end #module
