@@ -10,6 +10,7 @@ using JuMP
 using Cbc
 using DataFrames
 using CSV
+using JLD
 
 using MathOptInterface
 const MOI = MathOptInterface
@@ -18,17 +19,22 @@ const MOI = MathOptInterface
 #takes the number of types, number of objects, array of types, array of probabilities, and capacity vector and finds
 #solution
 function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
-	
-	#check if command-line arguments are desired
-	if $1 == "cmd"
-		d = readdlm($2)
-		num_types = d[1]
-		num_objects = d[2]
-		type_arr = d[3]
-		type_probs=d[4]
-		cap_vec=d[5]
-	end
-	
+	t = processor2(num_types,num_objects,type_arr,type_probs,cap_vec)
+	return t
+end
+function mech_basic_cbc_cmd()
+	d = load("$(ARGS[2]).jld")["d"]
+	println(d)
+	num_types = d[1]
+	num_objects = d[2]
+	type_arr = d[3]
+	type_probs = d[4]
+	cap_vec = d[5]
+	t = processor2(num_types,num_objects,type_arr,type_probs,cap_vec)
+	return t
+end
+function processor2(num_types,num_objects,type_arr,type_probs,cap_vec)
+
 	#turn cap_vec into an array
 	#otherwise solver bricks, don't use 0-dim or vector
 
@@ -79,6 +85,10 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 	#current directory to allow for generalization
 	CSV.write("basic-program/solver_basic/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
   return (assignment_arr)
+end
+
+if (ARGS[1] == "cmd")
+    mech_basic_cbc_cmd()
 end
 
 end #module
