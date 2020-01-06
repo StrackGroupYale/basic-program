@@ -12,7 +12,7 @@ I: Using the Command-Line<br/>
 3a) Input the following commands:<br/>
 julia basic-program/solver_basic/pkgs2add.jl <br/>
 julia basic-program/solver_basic/problem_generator.jl "cmd" "mean vector" "shock vector" "distribution string" "capacity vector" -- "output file name" string. E.g. "cmd" "1 2" ".2 .3 .4" "logistic" ".4 .6"  "output"<br/>
-julia basic-program/solver_basic/problem_solver.jl -- "cmd" -- "input file name string". E.g. "cmd" "output"<br/>
+julia basic-program/solver_basic/problem_solver.jl "cmd" "input file name string". E.g. "cmd" "output"<br/>
 
 II: Using a Script<br/>
 3b) If they are not already present, move files of the following name to this directory: <br/>
