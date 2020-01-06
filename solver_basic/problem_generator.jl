@@ -163,6 +163,8 @@ function data_gen_cmd()
     close(file)
 end
 
-data_gen_cmd()
+if (ARGS[1]=="cmd")
+    data_gen_cmd()
+end
 
 end #module
