@@ -13,6 +13,7 @@ using Distributions
 using JuMP
 using CSV
 using DataFrames
+using JLD
 
 ###input file gen
 
@@ -46,28 +47,8 @@ function quantile_prob_finder(distribution, quant)
 	return d
 end
 
-
-function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
-	
-	##If command-line arguments are given, accept them
-	#determines whether to write into file later
-	write = 0
-	if $1 == "cmd"
-		write = 1
-		utility_means = $2
-		shocks = $3
-		shock_distribution = $4
-		capacities = $5
-		#sixth argument is name of file to which results are written
-	end	
-	
-	
-	#covert information to dataframe
-	frm_util = DataFrame(CSV.File(utility_means))
-	frm_shocks = DataFrame(CSV.File(shocks))
-	frm_cap = DataFrame(CSV.File(capacities))
-
-	num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
+function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+    num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
 	num_objects = nrow(frm_util)
 
 	#convert dataframe to matrix
@@ -142,17 +123,46 @@ function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, v
 			type_arr[i,j] = type_vec2[i][j]
 		end
 	end
-	
+
 	d = (num_types,num_objects,type_arr,type_probs,cap_vec)
-	
-	if write ==1
-		#CSV.write("$6", DataFrame(d), writeheader=false)
-		#May be deprecated, if so use above as backup
-		name = chomp($6)
-		writedlm("$name", d)
-	end
-	
-	return (num_types,num_objects,type_arr,type_probs,cap_vec)
+    return d
 end
+function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
+
+    #covert information to dataframe
+    frm_util = DataFrame(CSV.File(utility_means))
+    frm_shocks = DataFrame(CSV.File(shocks))
+    frm_cap = DataFrame(CSV.File(capacities))
+    d = processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+	return d
+end
+
+function data_gen_cmd()
+    ##If command-line arguments are given, accept them
+    #determines whether to write into file later
+
+    utility_means = parse.(Float64,split(ARGS[2]))
+    println(utility_means)
+	shocks = parse.(Float64,split(ARGS[3]))
+    println(shocks)
+	shock_distribution = ARGS[4]
+	capacities = parse.(Float64,split(ARGS[5]))
+    println(capacities)
+	#sixth argument is name of file to which results are written
+
+    frm_util = DataFrame(mean = utility_means)
+    frm_shocks = DataFrame(shock = shocks)
+    frm_cap = DataFrame(cap =capacities)
+    name = chomp(ARGS[6])
+    d = processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+    #CSV.write("$name", DataFrame(d), writeheader=false)
+    println("I'm working")
+    #use JLD
+    file = jldopen("$name.jld", "w")
+    write(file, "d", d)
+    close(file)
+end
+
+data_gen_cmd()
 
 end #module
