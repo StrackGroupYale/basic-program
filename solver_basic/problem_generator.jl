@@ -54,17 +54,18 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	#convert dataframe to matrix
 	util_vec = Vector{Float64}(undef, nrow(frm_util))
 	for i in 1:nrow(frm_util)
-		util_vec[i] = frm_util.mean[i]
+        #println(frm_util.mean[i][1])
+		util_vec[i] = frm_util.mean[i][1]
 	end
 
 	shock_vec = Vector{Float64}(undef, nrow(frm_shocks))
 	for i in 1:nrow(frm_shocks)
-		shock_vec[i] = frm_shocks.shock[i]
+		shock_vec[i] = frm_shocks.shock[i][1]
 	end
 
 	cap_vec = Vector{Float64}(undef, nrow(frm_cap))
 	for i in 1:nrow(frm_cap)
-		cap_vec[i] = frm_cap.cap[i]
+		cap_vec[i] = frm_cap.cap[i][1]
 	end
 
 	##Find all type vector permutations
@@ -96,10 +97,11 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 
 	##generate distribution for shock vectors
 	type_probs = Vector{Float64}(undef, num_types)
+    #println(type_vector)
 	for i in 1:(nrow(frm_shocks)^nrow(frm_util))
 		prob = 1
 		for j in 1:nrow(frm_util)
-			prob = prob*quantile_probs[Int(type_vector[i][j]*100)]
+			prob = prob*quantile_probs[Int(floor(type_vector[i][j]*100))]
 		end
 		type_probs[i] = prob
 	end
@@ -128,11 +130,16 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
     return d
 end
 function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
-
+    #println(CSV.File(utility_means))
     #covert information to dataframe
     frm_util = DataFrame(CSV.File(utility_means))
     frm_shocks = DataFrame(CSV.File(shocks))
     frm_cap = DataFrame(CSV.File(capacities))
+    #frm_util = DataFrame(mean = CSV.File(utility_means))
+    #frm_shocks = DataFrame(shock = CSV.File(shocks))
+    #frm_cap = DataFrame(cap = CSV.File(capacities))
+    #println(DataFrame(CSV.File(utility_means)))
+    #println(frm_util)
     d = processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	return d
 end
@@ -142,12 +149,12 @@ function data_gen_cmd()
     #determines whether to write into file later
 
     utility_means = parse.(Float64,split(ARGS[2]))
-    println(utility_means)
+    #println(utility_means)
 	shocks = parse.(Float64,split(ARGS[3]))
-    println(shocks)
+    #println(shocks)
 	shock_distribution = ARGS[4]
 	capacities = parse.(Float64,split(ARGS[5]))
-    println(capacities)
+    #println(capacities)
 	#sixth argument is name of file to which results are written
 
     frm_util = DataFrame(mean = utility_means)
@@ -156,14 +163,17 @@ function data_gen_cmd()
     name = chomp(ARGS[6])
     d = processor(frm_util,frm_shocks,shock_distribution,frm_cap)
     #CSV.write("$name", DataFrame(d), writeheader=false)
-    println("I'm working")
+    #println("I'm working")
     #use JLD
     file = jldopen("$name.jld", "w")
     write(file, "d", d)
     close(file)
 end
 
-if (ARGS[1]=="cmd")
-    data_gen_cmd()
+if (size(ARGS)[1]>0)
+    if (ARGS[1]=="cmd")
+        data_gen_cmd()
+    end
 end
+
 end #module
