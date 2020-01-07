@@ -30,3 +30,5 @@ println("glpk: ",x," cbc: ",y)
 ####For other solvers, simply write a corresponding "problem" function in "exec_and_time.jl",
 ####Then add correpsonding "mech_basic" functions in problem_solver.jl
 ####Then write the corresponding timing functions in this script
+####Finally, add a "using" statement for the solver in problem_solver.jl
+####Also, add the PKG details to pkgs2add.jl
