@@ -1,23 +1,28 @@
-push!(LOAD_PATH, "basic-program/solver_basic")
-using problem_generator
-using problem_solver
+push!(LOAD_PATH, "/Users/joshuapurtell/documents/github")
 
-module CSV_gen
-export problem_cs,create_data,time_test 
+#import problem_generator
+#import problem_solver
+using Revise
+module exec_and_time
+export problem_cs,create_data,time_test
 using CSV
 using DataFrames
 
 ##generate Matrices:
 
-function df_gen(num_objects,num_typevec)
+function df_gen(num_objects,num_shocks)
 
+
+    #Find a way to define the column names (mean, shock, cap)
     # Utility Data, M1
     # Means, 1 Dimensional (A x 1)
-    u_df = DataFrame(A = Float64[])
-    for i in 1:num_objects
+    println(num_objects)
+    u_df = DataFrame(mean = Float64[])
+
+    for i in 1:(num_objects+1) #counteract bug where one row is left off
         push!(u_df, (rand()))
     end
-
+    #=
     # Shock Data, M2
     # Shocks Vects, 2 Dimensional (A x T)
     s_df = DataFrame()
@@ -26,30 +31,43 @@ function df_gen(num_objects,num_typevec)
         new_row .= rand()
         insert!(s_df, i, new_row, :type, makeunique=true)
     end
+    =#
+
+    # Shock Data, M2
+    # 1 Dimensional, (T x 1)
+    s_df = DataFrame(shock = Float64[])
+    #push!(s_df, "shock")
+    for i in 1:(num_shocks+1)
+        push!(s_df, (rand()))
+    end
 
     # Capacity Data, M3
     # 1 Dimensional, (A x 1)
-    c_df = DataFrame(A = Float64[])
-    for i in 1:num_objects
+    c_df = DataFrame(cap = Float64[])
+    #push!(c_df, "shock")
+    for i in 1:(num_objects+1)
         push!(c_df, (rand()))
     end
+    #normalize capacities
+    #sum = sum(c_df.cap)
+    #c_df.cap = broadcast(*,c_df.cap,1/sum)
     return (u_df,s_df,c_df)
 end
 
 
-function dummy_gen(num_objects,num_typevec)
-    M = df_gen(num_objects,num_typevec)
+function dummy_gen(num_objects,num_shocks)
+    M = df_gen(num_objects,num_shocks)
     #Write into file
-    CSV.write("dummy_data/util_data@$num_objects,$num_typevec.csv", M[1], writeheader=false)
-    CSV.write("dummy_data/shock_data@$num_objects,$num_typevec.csv", M[2], writeheader=false)
-    CSV.write("dummy_data/cap_data@$num_objects,$num_typevec.csv",  M[3], writeheader=false)
+    CSV.write("basic-program/solver_basic/dummy_data/util_data@$num_objects,$num_shocks.csv", M[1], writeheader=false)
+    CSV.write("basic-program/solver_basic/dummy_data/shock_data@$num_objects,$num_shocks.csv", M[2], writeheader=false)
+    CSV.write("basic-program/solver_basic/dummy_data/cap_data@$num_objects,$num_shocks.csv",  M[3], writeheader=false)
 
 end
 
 #create and solve problem
 function problem_cs(utility_means,shocks,shock_distribution,capacities)
-	inpu = problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
-	outpu = problem_solver.mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = Main.problem_solver.mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
 	return outpu
 end
 
@@ -59,8 +77,8 @@ end
 function create_data(seed1,seed2,scale_factor,num_iterations)
 	for i in 1:num_iterations
 		println("working")
-		seed1 = seed1*scale_factor^i
-		seed2 = seed2*scale_factor^i
+		seed1 = seed1*scale_factor*i
+		seed2 = seed2*scale_factor*i
 		dummy_gen(seed1,seed2)
 	end
 end
@@ -69,15 +87,15 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 	store_arr = Array{Any}(undef, num_iterations)
 	for i in 1:num_iterations
 			println("I'm working!")
-			seed1 = seed1*scale_factor^i
-			seed2 = seed2*scale_factor^i
+			seed1 = seed1*scale_factor*i
+			seed2 = seed2*scale_factor*i
+            println(seed1,seed2)
 			#run
 			d = problem_cs("basic-program/solver_basic/dummy_data/util_data@$seed1,$seed2.csv",
 				   	   "basic-program/solver_basic/dummy_data/shock_data@$seed1,$seed2.csv",
 				       "logistic",
 				       "basic-program/solver_basic/dummy_data/cap_data@$seed1,$seed2.csv"
 				       )
-			@time d
 	end
 end
 
