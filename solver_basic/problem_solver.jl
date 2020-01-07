@@ -24,7 +24,7 @@ function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
 end
 function mech_basic_cbc_cmd()
 	d = load("$(ARGS[2]).jld")["d"]
-	println(d)
+	#println(d)
 	num_types = d[1]
 	num_objects = d[2]
 	type_arr = d[3]
@@ -87,8 +87,10 @@ function processor2(num_types,num_objects,type_arr,type_probs,cap_vec)
   return (assignment_arr)
 end
 
-if (ARGS[1] == "cmd")
-    mech_basic_cbc_cmd()
+if (size(ARGS)[1]>0)
+    if (ARGS[1]=="cmd")
+        mech_basic_cbc_cmd()
+    end
 end
 
 end #module
