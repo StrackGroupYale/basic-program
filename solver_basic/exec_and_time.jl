@@ -8,8 +8,6 @@ export problem_cbc,problem_gurobi
 using CSV
 using DataFrames
 
-##generate Matrices:
-
 #create and solve problem
 function problem_cbc(utility_means,shocks,shock_distribution,capacities)
 	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
@@ -23,10 +21,17 @@ function problem_glpk(utility_means,shocks,shock_distribution,capacities)
 	return outpu
 end
 
+function problem_cplex(utility_means,shocks,shock_distribution,capacities)
+	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = Main.problem_solver.mech_basic_cplex(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	return outpu
+end
 end #module
+
 ###Unsupported
 #=
 
+##generate Matrices:
 
 function df_gen(num_objects,num_shocks)
 
@@ -72,6 +77,7 @@ function df_gen(num_objects,num_shocks)
     return (u_df,s_df,c_df)
 end
 
+
 function dummy_gen(num_objects,num_shocks)
     M = df_gen(num_objects,num_shocks)
     #Write into file
@@ -80,6 +86,7 @@ function dummy_gen(num_objects,num_shocks)
     CSV.write("basic-program/solver_basic/dummy_data/cap_data@$num_objects,$num_shocks.csv",  M[3], writeheader=false)
 
 end
+
 
 function create_data(seed1,seed2,scale_factor,num_iterations)
 	for i in 1:num_iterations
@@ -106,4 +113,3 @@ function time_test(seed1,seed2,scale_factor,num_iterations)
 	end
 end
 =#
-
