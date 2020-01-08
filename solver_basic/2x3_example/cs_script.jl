@@ -16,6 +16,11 @@ exec_and_time.problem_cbc("basic-program/solver_basic/2x3_example/util_data.csv"
            "logistic",
            "basic-program/solver_basic/2x3_example/cap_data.csv")
 
+exec_and_time.problem_cplex("basic-program/solver_basic/2x3_example/util_data.csv",
+          "basic-program/solver_basic/2x3_example/shock_data.csv",
+          "logistic",
+          "basic-program/solver_basic/2x3_example/cap_data.csv")
+
 ##Yield time results
 x = @elapsed exec_and_time.problem_glpk("basic-program/solver_basic/2x3_example/util_data.csv",
            "basic-program/solver_basic/2x3_example/shock_data.csv",
@@ -25,10 +30,20 @@ y = @elapsed exec_and_time.problem_cbc("basic-program/solver_basic/2x3_example/u
            "basic-program/solver_basic/2x3_example/shock_data.csv",
            "logistic",
            "basic-program/solver_basic/2x3_example/cap_data.csv")
-println("glpk: ",x," cbc: ",y)
 
-####For other solvers, simply write a corresponding "problem" function in "exec_and_time.jl",
-####Then add correpsonding "mech_basic" functions in problem_solver.jl
-####Then write the corresponding timing functions in this script
-####Finally, add a "using" statement for the solver in problem_solver.jl
-####Also, add the PKG details to pkgs2add.jl
+z = @elapsed exec_and_time.problem_cplex("basic-program/solver_basic/2x3_example/util_data.csv",
+          "basic-program/solver_basic/2x3_example/shock_data.csv",
+          "logistic",
+          "basic-program/solver_basic/2x3_example/cap_data.csv")
+
+#println("glpk: ",x," cbc: ",y, " cplex: ",z)
+#println("IMWORKING")
+
+#cbc
+#4 schools,3 shocks = 19s
+#4 schools,4 shocks = 14s
+#4 schools,5 shocks = 410s
+#4 schools,6 shocks = 6100s
+
+#glpk
+#4 schools,3 shocks = 4.5e-8s
