@@ -1,3 +1,5 @@
+#CPLEX_STUDIO_BINARIES= /Applications/CPLEX_Studio129/cplex/bin/x86-64_osx/ julia -e 'Pkg.add("CPLEX"); Pkg.build("CPLEX")'
+run(`export LD_LIBRARY_PATH="/Applications/CPLEX_Studio129/cplex/bin/x86-64_osx"$LD_LIBRARY_PATH`)
 ###pkg include
 using Pkg
 Pkg.add("CSV")
@@ -7,6 +9,9 @@ Pkg.add("Distributions")
 Pkg.add("MathOptInterface")
 Pkg.add("JuMP")
 Pkg.add("JLD")
+Pkg.add("Revise")
+Pkg.add("GLPK")
+Pkg.add("CPLEX")
 
 
 Pkg.build("CSV")
@@ -16,3 +21,6 @@ Pkg.build("Distributions")
 Pkg.build("MathOptInterface")
 Pkg.build("JuMP")
 Pkg.build("JLD")
+Pkg.build("Revise")
+Pkg.build("GLPK")
+Pkg.build("CPLEX")
