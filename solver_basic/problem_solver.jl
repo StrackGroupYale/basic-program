@@ -9,6 +9,7 @@ export mech_basic_cbc
 using JuMP
 using Cbc
 using GLPK
+using CPLEX
 
 using DataFrames
 using CSV
@@ -65,6 +66,29 @@ function mech_basic_glpk_cmd()
 	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	return t
 end
+
+###CPLEX
+###
+function mech_basic_cplex(num_types,num_objects,type_arr,type_probs,cap_vec)
+	m = Model(with_optimizer(CPLEX.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
+	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+	#d = @elapsed processor_glpk(num_types,num_objects,type_arr,type_probs,cap_vec)
+	#println("glpk: ", d)
+	return t
+end
+function mech_basic_cplex_cmd()
+	d = load("$(ARGS[2]).jld")["d"]
+	#println(d)
+	num_types = d[1]
+	num_objects = d[2]
+	type_arr = d[3]
+	type_probs = d[4]
+	cap_vec = d[5]
+	m = Model(with_optimizer(GLPK.CPLEX, tm_lim = 60000, msg_lev = GLPK.OFF))
+	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+	return t
+end
+
 function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	#turn cap_vec into an array
 	#otherwise solver bricks, don't use 0-dim or vector
@@ -129,11 +153,8 @@ Ipopt.jl
 =#
 
 if (size(ARGS)[1]>0)
-    if (ARGS[1]=="cmd_cbc")
+    if (ARGS[1]=="cmd")
         mech_basic_cbc_cmd()
-    end
-    if (ARGS[1]=="cmd_glpk")
-        mech_basic_glpk_cmd()
     end
 end
 
