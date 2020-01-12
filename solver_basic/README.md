@@ -27,3 +27,29 @@ julia basic-program/solver_basic/problem_solver.jl <br/>
 julia basic-program/solver_basic/exec_and_time.jl <br/>
 julia basic-program/solver_basic/gen_cs_script.jl <br/>
 5b) Check basic-program/solver_basic/assignment_data for output
+
+
+Compare 3 schools, 1 bad 1 intermediate 1 good, change relative position of intermediate school for 5-6 cases
+See how optimal mechanism changes
+compare with price mechanism: 100 points per student, students buy probabilities of different schools
+
+Is optimal allocation efficient? As in, are seats left open?
+How often are optimal allocations inefficient
+Don't have to treat everyone equally
+
+2 roads forward:
+- add efficiency constraints
+- implement quadratic price regime
+
+Write output script which writes in Latex which type gets what allocation
+Consider semantic examples:
+3 schools, A B C, A \succsim B \succsim C,U= "2 1 0" "5 1 0" "1 1 0", C = ".1 1 1"
+vary "5" between 2 and \infty and see how solution changes
+
+Consider converting real data into data that is usable for solver
+
+
+- One person works on visualization
+  with HTML/PDF, runs on multiple versions of the problem
+- One person implements the model with prices
+- Efficiency considerations (solver can take constraints as argument)
