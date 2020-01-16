@@ -14,6 +14,7 @@ using JuMP
 using CSV
 using DataFrames
 using JLD
+using CSV, DataFrames #this is an added line (remove if CSV thing does not work)
 
 ###input file gen
 
@@ -165,7 +166,9 @@ function data_gen_cmd()
     #CSV.write("$name", DataFrame(d), writeheader=false)
     #println("I'm working")
     #use JLD
-    file = jldopen("$name.jld", "w")
+	#the following line is the original line (it works); checking to see if it works for CSV	
+    #file = jldopen("$name.jld", "w")
+    file = CSV.write("$name.csv") #remove if CSV thing does not work
     write(file, "d", d)
     close(file)
 end
