@@ -1,0 +1,8 @@
+FOR GEN_TYPES
+  1. It currently hard-codes in the shock vectors but I can quickly patch that to be generalized if I know what kind of input format we want
+  2. All it does is generates the permutations of the shock sizes (from what I can tell, that's what lines 76-82 of problem_generator are doing)
+  
+FOR EFFICIENCY_CHECKER
+  1. It's still a work-in-progress (not done)
+  2. It includes the type_probability part
+  
