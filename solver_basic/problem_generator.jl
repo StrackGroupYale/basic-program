@@ -75,8 +75,7 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	#create nrow(frm_util)-length array of shock vectors
 	reshape_arr = Vector{Any}(undef, nrow(frm_util))
 	for i in 1:nrow(frm_util)
-		#takes into account utility transformation
-		reshape_arr[i] = quantile(shock_distribution,shock_vec)
+        reshape_arr[i] = shock_vec
 	end
 	expanded = expandgrid(reshape_arr...)
 
@@ -115,6 +114,11 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	##generate types
 	type_vec2 = Vector{Any}(undef, num_types)
 	for i in 1:num_types
+
+        #take into account the transformation
+        for j in 1:nrow(frm_util)
+            type_vector[i][j] = quantile(Logistic(),type_vector[i][j])
+        end
 		type_vec2[i] = broadcast(+,util_vec,type_vector[i])
 	end
 
@@ -165,7 +169,7 @@ function data_gen_cmd()
     #CSV.write("$name", DataFrame(d), writeheader=false)
     #println("I'm working")
     #use JLD
-	#the following line is the original line (it works); checking to see if it works for CSV	
+	#the following line is the original line (it works); checking to see if it works for CSV
     file = jldopen("$name.jld", "w")
     write(file, "d", d)
     close(file)
