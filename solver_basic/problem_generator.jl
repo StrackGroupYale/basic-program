@@ -75,7 +75,8 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	#create nrow(frm_util)-length array of shock vectors
 	reshape_arr = Vector{Any}(undef, nrow(frm_util))
 	for i in 1:nrow(frm_util)
-		reshape_arr[i] = shock_vec
+		#takes into account utility transformation
+		reshape_arr[i] = quantile(shock_distribution,shock_vec)
 	end
 	expanded = expandgrid(reshape_arr...)
 
@@ -97,7 +98,6 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 
 	##generate distribution for shock vectors
 	type_probs = Vector{Float64}(undef, num_types)
-    #println(type_vector)
 	for i in 1:(nrow(frm_shocks)^nrow(frm_util))
 		prob = 1
 		for j in 1:nrow(frm_util)
