@@ -9,7 +9,7 @@ export mech_basic_cbc
 using JuMP
 using Cbc
 using GLPK
-using CPLEX
+#using CPLEX
 
 using DataFrames
 using CSV
@@ -69,6 +69,7 @@ end
 
 ###CPLEX
 ###
+#=
 function mech_basic_cplex(num_types,num_objects,type_arr,type_probs,cap_vec)
 	m = Model(with_optimizer(CPLEX.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
 	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
@@ -88,6 +89,7 @@ function mech_basic_cplex_cmd()
 	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	return t
 end
+=#
 
 function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	#turn cap_vec into an array
