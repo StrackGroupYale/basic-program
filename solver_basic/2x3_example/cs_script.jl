@@ -10,7 +10,7 @@ exec_and_time.problem_glpk("basic-program/solver_basic/2x3_example/util_data.csv
            "basic-program/solver_basic/2x3_example/shock_data.csv",
            "logistic",
            "basic-program/solver_basic/2x3_example/cap_data.csv")
-
+#=
 exec_and_time.problem_cbc("basic-program/solver_basic/2x3_example/util_data.csv",
            "basic-program/solver_basic/2x3_example/shock_data.csv",
            "logistic",
@@ -38,6 +38,7 @@ z = @elapsed exec_and_time.problem_cplex("basic-program/solver_basic/2x3_example
 
 #println("glpk: ",x," cbc: ",y, " cplex: ",z)
 #println("IMWORKING")
+=#
 
 #cbc
 #4 schools,3 shocks = 19s
