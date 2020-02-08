@@ -2,6 +2,7 @@
 #Generalized function
 ############################
 
+#cmd j,cmd o
 module problem_solver
 export mech_basic_cbc
 
