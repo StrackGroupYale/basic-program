@@ -144,6 +144,7 @@ function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	k = sum(assignment_arr)
 	#current directory to allow for generalization
 	CSV.write("basic-program/solver_basic/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+	CSV.write("/Users/joshuapurtell/Desktop/Strack_Project/assignment_data/t_data@$num_objects,$num_types.csv", DataFrame(type_arr), writeheader=false)
  	return (assignment_arr)
 end
 
