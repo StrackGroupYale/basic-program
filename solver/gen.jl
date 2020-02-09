@@ -111,6 +111,14 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 		type_probs[i] = type_probs[i]/total2
 	end
 
+    ##Print "raw" types
+    rtype_arr = Array{Float64}(undef, num_types,num_objects)
+	for i in 1:num_types
+		for j in 1:num_objects
+			rtype_arr[i,j] = type_vector[i][j]
+		end
+	end
+    CSV.write("solver/assignment_data/rt_data@$num_objects,$num_types.csv", DataFrame(rtype_arr), writeheader=false)
 	##generate types
 	type_vec2 = Vector{Any}(undef, num_types)
 	for i in 1:num_types
