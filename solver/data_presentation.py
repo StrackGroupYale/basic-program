@@ -1,8 +1,5 @@
 #present data
 import pandas as pd
-import numpy as np
-import subprocess
-import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -31,8 +28,5 @@ def write_table(df):
 
 
 if __name__ == "__main__":
-    #print(os.getcwd())
     df = con_df('assignment_data/a_data@2,9.csv','assignment_data/rt_data@2,9.csv')
-    print(df)
     write_table(df)
-    #
