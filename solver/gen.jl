@@ -4,7 +4,7 @@ expandgrid:
 quantile_prob_finder:
 data_gen:
 =#
-module problem_generator
+module gen
 
 export data_gen
 
@@ -42,7 +42,7 @@ function quantile_prob_finder(distribution, quant)
 	elseif (distribution == "uniform")
 		d = pdf(Uniform(),quantile(Uniform(),quant*(0.01)))
 	else
-		printline("Error: distribution type not supported")
+		println("Error: distribution type not supported")
 	end
 	return d
 end

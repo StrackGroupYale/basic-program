@@ -1,29 +1,29 @@
 push!(LOAD_PATH, "/Users/joshuapurtell/documents/github")
 
-#import problem_generator
-#import problem_solver
+#using gen
+#using solve
 using Revise
-module exec_and_time
+module x_t
 export problem_cbc,problem_gurobi
 using CSV
 using DataFrames
 
 #create and solve problem
 function problem_cbc(utility_means,shocks,shock_distribution,capacities)
-	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
-	outpu = Main.problem_solver.mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = Main.solve.mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
 	return outpu
 end
 
 function problem_glpk(utility_means,shocks,shock_distribution,capacities)
-	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
-	outpu = Main.problem_solver.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = Main.solve.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
 	return outpu
 end
 
 function problem_cplex(utility_means,shocks,shock_distribution,capacities)
-	inpu = Main.problem_generator.data_gen(utility_means,shocks,shock_distribution,capacities)
-	outpu = Main.problem_solver.mech_basic_cplex(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+	inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
+	outpu = Main.solve.mech_basic_cplex(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
 	return outpu
 end
 end #module
