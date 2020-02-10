@@ -146,8 +146,9 @@ function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	#current directory to allow for generalization
 	CSV.write("solver/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
 	CSV.write("solver/assignment_data/t_data@$num_objects,$num_types.csv", DataFrame(type_arr), writeheader=false)
- 	return (assignment_arr)
+ 	return (assignment_arr) #
 end
+#
 
 
 ##other potential optimizers:
