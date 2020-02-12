@@ -44,4 +44,5 @@ Think of further models
     - what are eq. for other
   - use Nash eq. as constraint
 
-  
+ 
+ Try 100 types in 10 minutes. Try 60 minutes.
