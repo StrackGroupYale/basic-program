@@ -31,7 +31,7 @@ def con_df(distributions,types,utilities):
 def write_table(df):
     fig = plt.figure(facecolor='w', edgecolor='k')
     sns.heatmap(df,annot=True, cmap='viridis',square=False)
-    plt.xticks(fontsize = 6,rotation=0)
+    plt.xticks(fontsize = 4,rotation=0)
     plt.savefig('assignment_data/DataFrame.png')
 
 
