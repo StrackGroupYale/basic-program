@@ -60,3 +60,5 @@ util_vec<-t(util_vec)
 for (i in 1:nrow(type_vector)){
   type_vec2[i,]<-type_vector[i,]+util_vec
 }
+
+
