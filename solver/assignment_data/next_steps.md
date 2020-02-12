@@ -1,0 +1,9 @@
+- generate representation which bins types by allocation.
+- integrate efficiency into visualization.
+  - consider trading probabilities as general case.
+  - its possible that opening probabilities market makes things worse off, so be careful
+  - connections with game theory
+  - put social welfare in representation
+    - consider ex-post inefficiency
+    - consider interim inefficiency (probability trading)
+    - capacity of schools
