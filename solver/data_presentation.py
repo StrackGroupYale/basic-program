@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from fpdf import FPDF
 
 
 def con_df(distributions,types,utilities):
@@ -28,13 +29,26 @@ def con_df(distributions,types,utilities):
 
     return df
 
-def write_table(df):
+def write_table(df,title):
     fig = plt.figure(facecolor='w', edgecolor='k')
-    sns.heatmap(df,annot=True, cmap='viridis',square=False)
+    sns.heatmap(df,annot=True, cmap='viridis',square=False).set_title(f"{title}")
     plt.xticks(fontsize = 4,rotation=0)
-    plt.savefig('assignment_data/DataFrame.png')
+    path = f'assignment_data/{title}.png'
+    plt.savefig(path)
+    return path
 
+def concat_pdf(*args):
+    #to begin, each gets its own page. will edit this
+    pdf = FPDF()
+    for i in args:
+        #arbitrary initialization for x,y,w,h at first
+        x = 50; y=50; w = 100; h = 100
+        pdf.add_page()
+        pdf.image(i,x,y,w,h)
+    pdf.output("visualization.pdf","F")
 
 if __name__ == "__main__":
     df = con_df('assignment_data/a_data@2,9.csv','assignment_data/rt_data@2,9.csv','assignment_data/t_data@2,9.csv')
-    write_table(df)
+    table = write_table(df,"allocations")
+    concat_pdf(table,table)
+
