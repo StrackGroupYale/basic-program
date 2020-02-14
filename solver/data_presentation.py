@@ -36,7 +36,7 @@ def write_table(df,title):
     fig = plt.figure(facecolor='w', edgecolor='k')
     sns.heatmap(df,annot=True, cmap='viridis',square=False).set_title(f"{title}")
     plt.xticks(fontsize = 4,rotation=0)
-    path = f'assignment_data/{title}.png'
+    path = f'solver/assignment_data/{title}.png'
     plt.savefig(path)
     return path
 
@@ -113,7 +113,7 @@ def concat_page(size_pos,pdf_name,*args):
         #print(x,y,w,h)
         pdf.image(i,x,y,w,h)
         index = index + 1
-    pdf.output(f"assignment_data/{pdf_name}.pdf","F")
+    pdf.output(f"solver/assignment_data/{pdf_name}.pdf","F")
 
 def concat_pdfs(pdf_path,*args):
     merge = PyPDF2.PdfFileMerger()
@@ -123,7 +123,7 @@ def concat_pdfs(pdf_path,*args):
     merge.close()
 
 if __name__ == "__main__":
-    df = con_df('assignment_data/a_data@2,9.csv','assignment_data/rt_data@2,9.csv','assignment_data/t_data@2,9.csv')
+    df = con_df('solver/assignment_data/a_data@2,9.csv','solver/assignment_data/rt_data@2,9.csv','solver/assignment_data/t_data@2,9.csv')
     table = write_table(df,"allocations")
     #spots = placements_cw(11)
     #concat_page(spots,'11_tables',table,table,table,table,table,table,table,table,table,table,table)
