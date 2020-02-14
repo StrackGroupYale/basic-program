@@ -136,7 +136,10 @@ function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
 	assignment_arr = Array{Float64}(undef, num_types,num_objects)
 	for i in 1:num_types
 		for j in 1:num_objects
-	 		assignment_arr[i,j] = MOI.get(m, MOI.VariablePrimal(),X[i,j])
+			assignment = MOI.get(m, MOI.VariablePrimal(),X[i,j])
+			if (assignment < .005):
+				assignment = 0.0
+	 		assignment_arr[i,j] = assignment
 		end
 	end
 
