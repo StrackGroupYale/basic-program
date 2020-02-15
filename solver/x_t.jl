@@ -4,7 +4,7 @@ push!(LOAD_PATH, "/Users/joshuapurtell/documents/github")
 #using solve
 using Revise
 module x_t
-export problem_cbc,problem_gurobi
+export problem_cbc#,problem_gurobi
 using CSV
 using DataFrames
 
