@@ -27,12 +27,12 @@ function problem_cplex(utility_means,shocks,shock_distribution,capacities)
 	return outpu
 end
 
-## Timing Regime
-function direct_glpk(utility_max,shocks_size,folder)
-	inpu = Main.gen.data_gen_direct(utility_max,shocks_size)
-	outpu = Main.solve.mech_basic_glpk_test(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],folder)
-	return outpu
-end
+
+    function direct_glpk(utility_max,shocks_size,folder)
+        inpu = Main.gen.data_gen_direct(utility_max,shocks_size)
+        outpu = Main.solve.mech_basic_glpk_test(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],folder)
+        return outpu
+    end
 
 function time_test(shocks_num,uts_min,uts_max,folder)
     complexity_list = Float64[]
@@ -50,5 +50,18 @@ function time_test(shocks_num,uts_min,uts_max,folder)
 
     return frm_test
 end
+
+    function problem_cbc(utility_means,shocks,shock_distribution,capacities)
+        inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
+        outpu = Main.solve.mech_basic_cbc(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+        return outpu
+    end
+
+
+    function problem_cplex(utility_means,shocks,shock_distribution,capacities)
+        inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
+        outpu = Main.solve.mech_basic_cplex(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5])
+        return outpu
+    end
 
 end #module

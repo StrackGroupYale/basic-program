@@ -211,13 +211,18 @@ end
 				assignment_arr[i,j] = assignment
 			end
 		end
-
-		#turn assignment_arr into a dataframe
-
-		k = sum(assignment_arr)
-		#current directory to allow for generalization
-		return (assignment_arr) #
-	end
+function mech_basic_cbc_cmd()
+	d = load("$(ARGS[2]).jld")["d"]
+	#println(d)
+	num_types = d[1]
+	num_objects = d[2]
+	type_arr = d[3]
+	type_probs = d[4]
+	cap_vec = d[5]
+	m = Model(with_optimizer(Cbc.Optimizer, logLevel=1))
+	t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+	return t
+end
 
 
 ##other potential optimizers:
