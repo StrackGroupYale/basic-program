@@ -5,6 +5,8 @@ import seaborn as sns
 from fpdf import FPDF
 import itertools
 import numpy as np
+#import PIL
+#from PIL import Image
 
 ##Image Processing
 def primes(n): #borrowed
@@ -48,9 +50,9 @@ def placements_cw(partition_size):
             h = 1
             w = 2
         
-        for p in range(1,len(permed_UPF)-1): #used to not have -1
+        for p in range(1,len(permed_UPF)): #used to not have -1
             cand_h = np.prod(permed_UPF[:p])
-            cand_w = np.prod(permed_UPF[p+1:]) #used to not have 1
+            cand_w = np.prod(permed_UPF[p:]) #used to not have 1
             error = abs(cand_h/cand_w - 3/2)
             #print(cand_h, cand_w)
             if(error < best):

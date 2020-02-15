@@ -45,5 +45,5 @@ if __name__ == "__main__":
     df2,df = con_df('solver/assignment_data/a_data@2,9.csv','solver/assignment_data/rt_data@2,9.csv','solver/assignment_data/t_data@2,9.csv')
     allocs = write_table(df2,"allocations")
     types = write_table(df,"types")
-    sp = data_presentation.placements_cw(2)
+    sp = data_presentation.placements_cw(4)
     data_presentation.concat_page(sp,'better_version','solver/assignment_data/allocations.png','solver/assignment_data/types.png')
