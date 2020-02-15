@@ -55,6 +55,13 @@ module solve
 		#println("glpk: ", d)
 		return t
 	end
+	function mech_basic_glpk_test(num_types,num_objects,type_arr,type_probs,cap_vec,folder)
+		m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
+		t = processor_test(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder)
+		#d = @elapsed processor_glpk(num_types,num_objects,type_arr,type_probs,cap_vec)
+		#println("glpk: ", d)
+		return t
+	end
 	function mech_basic_glpk_cmd()
 		d = load("$(ARGS[2]).jld")["d"]
 		#println(d)
@@ -154,6 +161,64 @@ end
 		return (assignment_arr) #
 	end
 #
+	function processor_test(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder)
+		#turn cap_vec into an array
+		#otherwise solver bricks, don't use 0-dim or vector
+
+		cap_arr = Matrix{Float64}(undef,1,num_objects)
+		for i in 1:num_objects
+			cap_arr[i] = cap_vec[i]
+		end
+
+		T = num_types #rows, represents length of Theta
+		A = num_objects #columns, represents length of A
+
+		#m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
+
+		#Alloc variable
+		@variable(m, X[1:T,1:A])
+
+		#capacity constraint
+		@constraint(m, Ccon, transpose(type_probs)*X .<= cap_arr)
+
+		#feasibility constraint
+		ones_T = ones(1,T)
+		ones_A = ones(1,A)
+		@constraint(m, Fcon, ones_T*X .<= ones_A)
+
+		#non-negativity constraint
+		@constraint(m, ncon, X .>= 0)
+
+		#Incentive Compatibility constraint
+		#@constraint(m, con[i=1:T,j=1:T], sum( type_arr[i,k]*X[i,k] for k in 1:A)-sum( type_arr[i,k]*X[j,k] for k in 1:A)>= 0)
+
+		#Avoid addition to increase performance?
+		#add_to_expression!(sum( type_arr[i,k]*X[i,k] for k in 1:A),-sum( type_arr[i,k]*X[j,k] for k in 1:A))
+		@constraint(m, con[i=1:T,j=1:T], add_to_expression!(sum( type_arr[i,k]*X[i,k] for k in 1:A),-sum( type_arr[i,k]*X[j,k] for k in 1:A))>= 0)
+
+		#objective
+		@objective(m, Max, sum( transpose(type_probs[i])*(transpose(X[i,:])*type_arr[i,:]) for i in 1:T))
+
+		status = optimize!(m)
+
+		#find argmax
+		assignment_arr = Array{Float64}(undef, num_types,num_objects)
+		for i in 1:num_types
+			for j in 1:num_objects
+				assignment = MOI.get(m, MOI.VariablePrimal(),X[i,j])
+				if (assignment < 1*10^(-10))
+					assignment = 0.0
+				end
+				assignment_arr[i,j] = assignment
+			end
+		end
+
+		#turn assignment_arr into a dataframe
+
+		k = sum(assignment_arr)
+		#current directory to allow for generalization
+		return (assignment_arr) #
+	end
 
 
 ##other potential optimizers:

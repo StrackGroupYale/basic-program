@@ -4,7 +4,7 @@ push!(LOAD_PATH, "/Users/joshuapurtell/documents/github")
 #using solve
 using Revise
 module x_t
-export problem_glpk, test_glpk, time_test#,problem_gurobi
+export problem_glpk, direct_glpk, time_test#,problem_gurobi
 using CSV
 using DataFrames
 
@@ -30,7 +30,7 @@ end
 ## Timing Regime
 function direct_glpk(utility_max,shocks_size,folder)
 	inpu = Main.gen.data_gen_direct(utility_max,shocks_size)
-	outpu = Main.solve.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],folder)
+	outpu = Main.solve.mech_basic_glpk_test(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],folder)
 	return outpu
 end
 
