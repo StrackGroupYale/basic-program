@@ -63,8 +63,9 @@ def placements_cw(partition_size):
     #print('h,w',h,w)
     #for i in range(0,partition_size):
     size = [200/w,290/h]
-    for j in range(0,w):
-        for k in range(0,h):
+
+    for k in range(0,h):
+        for j in range(0,w):
             #b = [int(size[0]+i*size[0]),int(size[1]+k*size[1]),int(size[0]/2),int(size[1]/2)]
             b = [j * size[0],k * size[1], int(size[0]), int(size[1])]
             #print(size[0])
