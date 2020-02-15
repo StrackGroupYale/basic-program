@@ -6,7 +6,7 @@ data_gen:
 =#
 module gen
 
-export data_gen
+export data_gen,data_gen_direct
 
 
 using Distributions
@@ -100,7 +100,11 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
 	for i in 1:(nrow(frm_shocks)^nrow(frm_util))
 		prob = 1
 		for j in 1:nrow(frm_util)
-			prob = prob*quantile_probs[Int(floor(type_vector[i][j]*100))]
+			quant = Int(floor(type_vector[i][j]*100))
+			if (quant == 0)
+				quant = 1
+			end
+			prob = prob*quantile_probs[quant]
 		end
 		type_probs[i] = prob
 	end
@@ -142,17 +146,37 @@ function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
     return d
 end
 function data_gen(utility_means,shocks,shock_distribution,capacities) #vector, vector, string, vector
-    #println(CSV.File(utility_means))
-    #covert information to dataframe
     frm_util = DataFrame(CSV.File(utility_means))
     frm_shocks = DataFrame(CSV.File(shocks))
-    frm_cap = DataFrame(CSV.File(capacities))
-    #frm_util = DataFrame(mean = CSV.File(utility_means))
-    #frm_shocks = DataFrame(shock = CSV.File(shocks))
-    #frm_cap = DataFrame(cap = CSV.File(capacities))
-    #println(DataFrame(CSV.File(utility_means)))
-    #println(frm_util)
+	frm_cap = DataFrame(CSV.File(capacities))
+	#print(frm_cap)
     d = processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+	return d
+end
+
+function data_gen_direct(ut_max,shocks_size)
+	#gen random list for utilities
+	ut_list = Float64[]
+	for i in i:ut_max
+		append!(ut_list,11+i*rand())
+	end
+	shocks_list = Float64[]
+	for i in 1:shocks_size
+		append!(shocks_list,i)
+	end
+	shocks_list = broadcast(*,shocks_list,1/sum(shocks_list))
+	caps_list = Float64[]
+	for i in 1:ut_max
+		append!(caps_list,Int(floor(rand()*100))/100)
+	end
+	caps_list = broadcast(*,caps_list,1/sum(caps_list))
+	caps_list = broadcast(Int(),caps_list)
+	frm_util = DataFrame(mean = ut_list)
+	frm_shock = DataFrame(shock = shocks_list)
+	frm_cap = DataFrame(cap = caps_list)
+
+	#print(frm_cap)
+	d = processor(frm_util, frm_shock, "logistic", frm_cap)
 	return d
 end
 
@@ -188,5 +212,4 @@ if (size(ARGS)[1]>0)
         data_gen_cmd()
     end
 end
-
 end #module

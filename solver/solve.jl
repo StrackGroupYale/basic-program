@@ -48,9 +48,9 @@ module solve
 
 ###GLPK
 ###
-	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec)
+	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,folder)
 		m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
-		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder)
 		#d = @elapsed processor_glpk(num_types,num_objects,type_arr,type_probs,cap_vec)
 		#println("glpk: ", d)
 		return t
@@ -63,8 +63,9 @@ module solve
 		type_arr = d[3]
 		type_probs = d[4]
 		cap_vec = d[5]
+		folder = d[6]
 		m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
-		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder)
 		return t
 	end
 
@@ -92,7 +93,7 @@ function mech_basic_cplex_cmd()
 end
 =#
 
-	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m)
+	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder)
 		#turn cap_vec into an array
 		#otherwise solver bricks, don't use 0-dim or vector
 
@@ -148,8 +149,8 @@ end
 
 		k = sum(assignment_arr)
 		#current directory to allow for generalization
-		CSV.write("solver/assignment_data/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
-		CSV.write("solver/assignment_data/t_data@$num_objects,$num_types.csv", DataFrame(type_arr), writeheader=false)
+		CSV.write("$folder/a_data@$num_objects,$num_types.csv", DataFrame(assignment_arr), writeheader=false)
+		CSV.write("$folder/t_data@$num_objects,$num_types.csv", DataFrame(type_arr), writeheader=false)
 		return (assignment_arr) #
 	end
 #

@@ -11,6 +11,7 @@ Pkg.add("JuMP")
 Pkg.add("JLD")
 Pkg.add("Revise")
 Pkg.add("GLPK")
+Pkg.add("Plots")
 #Pkg.add("CPLEX")
 #trivial comment
 
@@ -24,4 +25,5 @@ Pkg.build("JuMP")
 Pkg.build("JLD")
 Pkg.build("Revise")
 Pkg.build("GLPK")
+Pkg.build("Plots")
 #Pkg.build("CPLEX")
