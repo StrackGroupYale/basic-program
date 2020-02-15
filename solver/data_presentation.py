@@ -44,10 +44,13 @@ def placements_cw(partition_size):
         permed_UPF = np.zeros(int(UPF_len))
         for m in range(0,len(permed_UPF)):
             permed_UPF[m] = UPF[l[k][m]]
-
-        for p in range(1,len(permed_UPF)):
+        if (len(permed_UPF) == 1):
+            h = 1
+            w = 2
+        
+        for p in range(1,len(permed_UPF)-1): #used to not have -1
             cand_h = np.prod(permed_UPF[:p])
-            cand_w = np.prod(permed_UPF[p:])
+            cand_w = np.prod(permed_UPF[p+1:]) #used to not have 1
             error = abs(cand_h/cand_w - 3/2)
             #print(cand_h, cand_w)
             if(error < best):
@@ -89,7 +92,7 @@ def concat_pdfs(pdf_path,*args):
     merge.close()
 
 if __name__ == "__main__":
-
+    2+2
     #spots = placements_cw(11)
     #concat_page(spots,'11_tables',table,table,table,table,table,table,table,table,table,table,table)
     #spots = placements_cw(17)

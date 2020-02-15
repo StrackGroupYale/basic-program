@@ -5,6 +5,7 @@ from fpdf import FPDF
 import itertools
 import numpy as np
 import PyPDF2
+import data_presentation
 ##Writing allocation data
 def con_df(distributions,types,utilities): #construct dataframe with relevant data
     dist_df = pd.read_csv(distributions,header=None)
@@ -26,9 +27,9 @@ def con_df(distributions,types,utilities): #construct dataframe with relevant da
     for i in range(0, len(dist_df.columns)):
         dist_names.append(f'Allocation for School {i + 1}')
     dist_df.columns = dist_names
-    df = pd.concat([dist_df,type_df,ut_df], axis=1)
-
-    return df
+    df = pd.concat([type_df,ut_df], axis=1)
+    df2 = dist_df
+    return df2,df
 
 def write_table(df,title):
     fig = plt.figure(facecolor='w', edgecolor='k')
@@ -38,10 +39,11 @@ def write_table(df,title):
     plt.savefig(path)
     return path
 
-def bin_it(df):
-    
 
-   #want to write types which get assignment for each school
 if __name__ == "__main__":
-    df = con_df('solver/assignment_data/a_data@2,9.csv','solver/assignment_data/rt_data@2,9.csv','solver/assignment_data/t_data@2,9.csv')
-    table = write_table(df,"allocations")
+    #print(data_presentation.primes(2))
+    df2,df = con_df('solver/assignment_data/a_data@2,9.csv','solver/assignment_data/rt_data@2,9.csv','solver/assignment_data/t_data@2,9.csv')
+    allocs = write_table(df2,"allocations")
+    types = write_table(df,"types")
+    sp = data_presentation.placements_cw(2)
+    data_presentation.concat_page(sp,'better_version','solver/assignment_data/allocations.png','solver/assignment_data/types.png')
