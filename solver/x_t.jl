@@ -43,6 +43,7 @@ function time_test(shocks_num,uts_min,uts_max,folder)
         t = @elapsed direct_glpk(shocks_num,m,folder)
         #t = 0
         append!(time_list,t)
+        print("done ",m)
     end
     frm_test= DataFrame(types = complexity_list,time = time_list)
     CSV.write("solver/test_data/time@$shocks_num,($uts_min,$uts_max).csv", frm_test) #, writeheader=false

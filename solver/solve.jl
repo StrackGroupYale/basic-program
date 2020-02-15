@@ -23,7 +23,6 @@ module solve
 	#takes the number of types, number of objects, array of types, array of probabilities, and capacity vector and finds
 	#solution
 
-
 	###CBC
 	###
 	function mech_basic_cbc(num_types,num_objects,type_arr,type_probs,cap_vec)
