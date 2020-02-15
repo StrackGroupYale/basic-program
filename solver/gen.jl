@@ -157,20 +157,19 @@ end
 function data_gen_direct(ut_max,shocks_size)
 	#gen random list for utilities
 	ut_list = Float64[]
-	for i in i:ut_max
+	for i in 1:ut_max
 		append!(ut_list,11+i*rand())
 	end
 	shocks_list = Float64[]
 	for i in 1:shocks_size
-		append!(shocks_list,i)
+		append!(shocks_list,.01*i) #Int(floor(100*(i/shocks_size)))/100
 	end
-	shocks_list = broadcast(*,shocks_list,1/sum(shocks_list))
+	#shocks_list = broadcast(*,shocks_list,1/sum(shocks_list))
 	caps_list = Float64[]
 	for i in 1:ut_max
 		append!(caps_list,Int(floor(rand()*100))/100)
 	end
 	caps_list = broadcast(*,caps_list,1/sum(caps_list))
-	caps_list = broadcast(Int(),caps_list)
 	frm_util = DataFrame(mean = ut_list)
 	frm_shock = DataFrame(shock = shocks_list)
 	frm_cap = DataFrame(cap = caps_list)

@@ -11,4 +11,4 @@ function plot_performance(shocks,utilities)
     savefig("solver/test_data/time_vs_complexity@$shocks,$utilities.png")
 end
 
-plot_performance(3,7)
+plot_performance(3,10)

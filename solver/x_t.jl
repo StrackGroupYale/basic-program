@@ -45,7 +45,7 @@ function time_test(shocks_num,uts_min,uts_max,folder)
         append!(time_list,t)
     end
     frm_test= DataFrame(types = complexity_list,time = time_list)
-    CSV.write("solver/test_data/time@$shocks_num,$uts_max.csv", frm_test) #, writeheader=false
+    CSV.write("solver/test_data/time@$shocks_num,($uts_min,$uts_max).csv", frm_test) #, writeheader=false
 
     return frm_test
 end
