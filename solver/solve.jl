@@ -138,7 +138,7 @@ end
 		for i in 1:num_types
 			for j in 1:num_objects
 				assignment = MOI.get(m, MOI.VariablePrimal(),X[i,j])
-				if (assignment < .0005)
+				if (assignment < 1*10^(-10))
 					assignment = 0.0
 				end
 				assignment_arr[i,j] = assignment
