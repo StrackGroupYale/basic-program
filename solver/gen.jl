@@ -47,9 +47,9 @@ function quantile_prob_finder(distribution, quant)
 	return d
 end
 
-function processor(frm_util,frm_shocks,shock_distribution,frm_cap)
-    num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
-	num_objects = nrow(frm_util)
+	function gen_processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+		num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
+		num_objects = nrow(frm_util)
 
 	#convert dataframe to matrix
 	util_vec = Vector{Float64}(undef, nrow(frm_util))
