@@ -96,8 +96,11 @@ module solve
 			end
 			CSV.write("$folder/a_data$alloc_designation@$num_objects,$num_types.csv", assign_df, writeheader=false)
 			CSV.write("$folder/t_data$alloc_designation@$num_objects,$num_types.csv", type_df, writeheader=false)
+			return (assignment_arr,type_arr,type_probs,type_vec_shock,alloc_designation)
 		end
-		return (assignment_arr,type_arr,type_probs,type_vec_shock) #
+		if (print_bool == 0)
+			return (assignment_arr,type_arr,type_probs,type_vec_shock)
+		end#
 	end
 
 	#FOR GIVING ARGUMENTS BY COMMANDLINE, NOT RECOMMENDED

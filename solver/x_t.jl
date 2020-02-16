@@ -19,7 +19,7 @@ module x_t
     ##CALCULATE TOTAL WELFARE AND/OR INDIVIDUAL WELFARE
     #df columns initialized as x1,x2,...
 
-    function welfare(alloc,type_prob,utility_types,type_vec_shock,price_bool,total_bool,indiv_bool,fromCSV_bool)
+    function welfare(alloc,type_prob,utility_types,type_vec_shock,folder,price_bool=0,total_bool=1,indiv_bool=1,fromCSV_bool=0,alloc_designation="constrained")
         if (fromCSV_bool == 1)
             alloc_arr = readdlm(alloc, ',', Float64)
             prob_arr = readdlm(type_prob, ',', Float64)
@@ -32,8 +32,8 @@ module x_t
         end
         #println("Prob arr ",prob_arr[1])
 
-        T = length(prob_arr)
-        A = length(alloc)/T
+        T = Int(length(prob_arr))
+        A = Int(length(alloc)/T)
 
         if (total_bool == 1)
             total_df = DataFrame(Type = String[],Total = Float64[])
@@ -68,6 +68,7 @@ module x_t
             end
         end
 
+        CSV.write("$folder/a_data:info$alloc_designation@$A,$T.csv", join_df, writeheader=false)
         return join_df
     end
 
