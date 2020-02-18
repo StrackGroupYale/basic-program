@@ -9,7 +9,8 @@ module plotting
         plot(x,y,title="Time to Solve Over Number of Types")
         xlabel!("Number of Types")
         ylabel!("Seconds")
-        savefig("solver/test_data/time_vs_complexity@$shocks,$utilities.png")
+        savefig(f"solver/test_data/time_vs_complexity@$shocks,$utilities.png")
     end
-    function 
+    function plot_welfare()
+    end
 end
