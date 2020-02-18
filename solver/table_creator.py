@@ -31,19 +31,38 @@ def con_df(distributions,types,utilities): #construct dataframe with relevant da
     df2 = dist_df
     return df2,df
 
-def write_table(df,title):
+def write_table(df,title,folder_path):
     fig = plt.figure(facecolor='w', edgecolor='k')
     sns.heatmap(df,annot=True, cmap='viridis',square=False).set_title(f"{title}")
     plt.xticks(fontsize = 4,rotation=0)
-    path = f'solver/assignment_data/{title}.png'
+    path = f'{folder_path}/{title}.png'
     plt.savefig(path)
     return path
 
+def write_allocs_types_(num_schools,num_types,name,folder_path,gen_utilities_filename):
+    size = (num_schools,num_types)
+    df2,df = con_df(f'{folder_path}/a_data@{size[0]},{size[1]}.csv',f'{folder_path}/rt_data@{size[0]},{size[1]}.csv',f'{folder_path}/t_data@{size[0]},{size[1]}.csv')
+    allocs = write_table(df2,"allocations",f'{folder_path}')
+    types = write_table(df,"types",f'{folder_path}')
+
+    #find constrained and unconstrained utilities
+    u_utilities_df = pd.read_csv(f"{folder_path}/{gen_utilities_filename}infounconstrained@{size[0]},{size[1]}.csv")
+    c_utilities_df = pd.read_csv(f"{folder_path}/{gen_utilities_filename}infoconstrained@{size[0]},{size[1]}.csv")
+    #print(u_utilities_df)
+    u_tot = u_utilities_df["Total"][1]
+    c_tot = c_utilities_df["Total"][1]
+    u_utilities = write_table(pd.DataFrame(u_utilities_df["Indiv"]),f"Unconstrained_Utilities@Total={u_tot}",f'{folder_path}')
+    c_utilities = write_table(pd.DataFrame(c_utilities_df["Indiv"]),f"Constrained_Utilities@Total={c_tot}",f'{folder_path}')
+    
+    
+    approx_proportion = 4#140*(1 - (.5)**(2*size[0]/size[1]))*(1/(size[1])) + 1000 #140 initialized for 2,9 -> 4
+    sp = data_presentation.placements_cw(approx_proportion)
+    data_presentation.concat_page(sp,f"{name}@total_(un)constrained_utility={c_tot},({u_tot})",f"{folder_path}/allocations.png",f"{folder_path}/types.png",f"{folder_path}/Constrained_Utilities@Total={c_tot}.png",f"{folder_path}/Unconstrained_Utilities@Total={u_tot}.png")
+
+    return f'{folder_path}/{name}.pdf'
 
 if __name__ == "__main__":
-    #print(data_presentation.primes(2))
-    df2,df = con_df('solver/assignment_data/a_data@2,9.csv','solver/assignment_data/rt_data@2,9.csv','solver/assignment_data/t_data@2,9.csv')
-    allocs = write_table(df2,"allocations")
-    types = write_table(df,"types")
-    sp = data_presentation.placements_cw(4)
-    data_presentation.concat_page(sp,'better_version','solver/assignment_data/allocations.png','solver/assignment_data/types.png')
+    write_allocs_types_(2,9,'Allocation_Info','solver/assignment_data','a_data:')
+    
+
+

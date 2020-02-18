@@ -68,14 +68,13 @@ module x_t
             end
         end
 
-        CSV.write("$folder/a_data:info$alloc_designation@$A,$T.csv", join_df, writeheader=false)
+        CSV.write("$folder/a_data:info$alloc_designation@$A,$T.csv", join_df)
         return join_df
     end
 
     ##CALCULATE CAPACITY FULFILLMENT
     function cap_count()
     end
-
 
 
     #TIME TESTING
