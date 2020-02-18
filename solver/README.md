@@ -53,3 +53,6 @@ Consider converting real data into data that is usable for solver
   with HTML/PDF, runs on multiple versions of the problem
 - One person implements the model with prices
 - Efficiency considerations (solver can take constraints as argument)
+
+For the efficiency solver, type into the command line:
+  Rscript efficiency.R [path_to_utility] [path_to_assignment] [num_schools] [path_to_capacity]
