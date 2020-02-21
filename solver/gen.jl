@@ -39,7 +39,7 @@ module gen
 		return d
 	end
 
-	function gen_processor(frm_util,frm_shocks,shock_distribution,frm_cap)
+	function gen_processor(frm_util,frm_shocks,shock_distribution,frm_cap,)
 		num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
 		num_objects = nrow(frm_util)
 
@@ -116,7 +116,7 @@ module gen
 				rtype_arr[i,j] = type_vector[i][j]
 			end
 		end
-		CSV.write("solver/assignment_data/rt_data@$num_objects,$num_types.csv", DataFrame(rtype_arr), writeheader=false)
+		#CSV.write("solver/assignment_data/rt_data@$num_objects,$num_types.csv", DataFrame(rtype_arr), writeheader=false)
 		##generate types
 		type_vec2 = Vector{Any}(undef, num_types)
 		for i in 1:num_types
@@ -135,7 +135,7 @@ module gen
 				type_arr[i,j] = type_vec2[i][j]
 			end
 		end
-		d = (num_types,num_objects,type_arr,type_probs,cap_vec,type_vecprint)
+		d = (num_types,num_objects,type_arr,type_probs,cap_vec,type_vecprint,rtype_arr)
 		return d
 	end
 

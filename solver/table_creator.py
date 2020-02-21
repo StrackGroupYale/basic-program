@@ -42,9 +42,13 @@ def write_table(df,title,folder_path):
 
 def write_allocs_types_(num_schools,num_types,name,folder_path,gen_utilities_filename):
     size = (num_schools,num_types)
-    df2,df = con_df(f'{folder_path}/a_data@{size[0]},{size[1]}.csv',f'{folder_path}/rt_data@{size[0]},{size[1]}.csv',f'{folder_path}/t_data@{size[0]},{size[1]}.csv')
-    allocs = write_table(df2,"allocations",f'{folder_path}')
-    types = write_table(df,"types",f'{folder_path}')
+    u_df2,u_df = con_df(f'{folder_path}/a_datainfo_unconstrained@{size[0]},{size[1]}.csv',f'{folder_path}/rt_data@{size[0]},{size[1]}.csv',f'{folder_path}/t_data@{size[0]},{size[1]}.csv')
+    u_allocs = write_table(u_df2,"unconstrained_allocations",f'{folder_path}')
+    u_types = write_table(u_df,"unconstrained_types",f'{folder_path}')
+
+    c_df2,c_df = con_df(f'{folder_path}/a_datainfo_constrained@{size[0]},{size[1]}.csv',f'{folder_path}/rt_data@{size[0]},{size[1]}.csv',f'{folder_path}/t_data@{size[0]},{size[1]}.csv')
+    c_allocs = write_table(c_df2,"constrained_allocations",f'{folder_path}')
+    c_types = write_table(c_df,"constrained_types",f'{folder_path}')
 
     #find constrained and unconstrained utilities
     u_utilities_df = pd.read_csv(f"{folder_path}/{gen_utilities_filename}infounconstrained@{size[0]},{size[1]}.csv")
@@ -57,13 +61,12 @@ def write_allocs_types_(num_schools,num_types,name,folder_path,gen_utilities_fil
     
     
     approx_proportion = int(math.floor(140*(1 - (.5)**(2*size[0]/size[1]))*(1/(size[1]))))#140 initialized for 2,9 -> 4
-    sp = data_presentation.placements_cw(approx_proportion)
-    data_presentation.concat_page(sp,f"{name}@total_(un)constrained_utility={c_tot},({u_tot})",f"{folder_path}/allocations.png",f"{folder_path}/types.png",f"{folder_path}/Constrained_Utilities@Total={c_tot}.png",f"{folder_path}/Unconstrained_Utilities@Total={u_tot}.png")
+    sp = data_presentation.placements_cw(2*approx_proportion)
+    data_presentation.concat_page(sp,f"{name}@total_(un)constrained_utility={c_tot},({u_tot})",f"{folder_path}/constrained_allocations.png",f"{folder_path}/unconstrained_types.png",f"{folder_path}/unconstrained_allocations.png",f"{folder_path}/constrained_types.png",f"{folder_path}/Constrained_Utilities@Total={c_tot}.png",f"{folder_path}/Unconstrained_Utilities@Total={u_tot}.png")
 
     return f'{folder_path}/{name}.pdf'
 
 if __name__ == "__main__":
     write_allocs_types_(2,9,'Allocation_Info','solver/assignment_data','a_data:')
     
-
 
