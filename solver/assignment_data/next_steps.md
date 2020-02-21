@@ -46,3 +46,8 @@ Think of further models
 
  
  Try 100 types in 10 minutes. Try 60 minutes.
+ 
+ 
+ FEB 21
+ - Add efficiency as constraint
+ - Makefile
