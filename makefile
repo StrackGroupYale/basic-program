@@ -15,5 +15,6 @@ read capVec
 echo give me an output filename:
 read fileName
 
+echo "Calculating"
 
 julia solver/gen.jl $cmd $meanVector $shockVector $distString $capVec $fileName
