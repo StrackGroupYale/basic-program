@@ -62,10 +62,11 @@ def write_allocs_types_(num_schools,num_types,name,folder_path,gen_utilities_fil
     
     approx_proportion = int(math.floor(140*(1 - (.5)**(2*size[0]/size[1]))*(1/(size[1]))))#140 initialized for 2,9 -> 4
     sp = data_presentation.placements_cw(2*approx_proportion)
-    data_presentation.concat_page(sp,f"{name}@total_(un)constrained_utility={c_tot},({u_tot})",f"{folder_path}/constrained_allocations.png",f"{folder_path}/constrained_types.png",f"{folder_path}/unconstrained_allocations.png",f"{folder_path}/unconstrained_types.png",f"{folder_path}/Constrained_Utilities@Total={c_tot}.png",f"{folder_path}/Unconstrained_Utilities@Total={u_tot}.png")
+    data_presentation.concat_page(sp,f"{name}@total_(un)constrained_utility={c_tot},({u_tot})",f"{folder_path}/constrained_allocations.png",f"{folder_path}/unconstrained_types.png",f"{folder_path}/unconstrained_allocations.png",f"{folder_path}/constrained_types.png",f"{folder_path}/Constrained_Utilities@Total={c_tot}.png",f"{folder_path}/Unconstrained_Utilities@Total={u_tot}.png")
 
     return f'{folder_path}/{name}.pdf'
 
 if __name__ == "__main__":
     write_allocs_types_(2,9,'Allocation_Info','solver/assignment_data','a_data:')
+    
 

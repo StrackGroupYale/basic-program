@@ -9,7 +9,7 @@ module x_t
     #GENERAL USE, GENERATES AND SOLVES PROBLEM
     function problem_glpk(utility_means,shocks,shock_distribution,capacities,folder,print_bool,infocon_bool)
         inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
-        outpu = Main.solve.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],folder,print_bool,infocon_bool,inpu[6])
+        outpu = Main.solve.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],inpu[7],folder,print_bool,infocon_bool,inpu[6])
         return outpu
     end
 

@@ -10,9 +10,9 @@ module solve
 	const MOI = MathOptInterface
 
 	#GENERATES AND SOLVES PROBLEM USING GLPK SOLVER
-	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,folder,print_bool,infocon_bool,type_vec_shock)
+	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,folder,print_bool,infocon_bool,type_vec_shock)
 		m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
-		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder,print_bool,infocon_bool,type_vec_shock)
+		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,print_bool,infocon_bool,type_vec_shock)
 		return t
 	end
 	function mech_basic_glpk_cmd()
@@ -30,7 +30,7 @@ module solve
 	end
 
 	###solves given model
-	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,m,folder,print_bool,infocon_bool,type_vec_shock)
+	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,print_bool,infocon_bool,type_vec_shock)
 		#turn cap_vec into an array
 		#otherwise solver bricks, don't use 0-dim or vector
 
@@ -86,6 +86,7 @@ module solve
 		#turn assignment_arr into a dataframe
 		assign_df = convert(DataFrame,assignment_arr)
 		type_df = convert(DataFrame,type_arr)
+		rtype_df = convert(DataFrame,rtype_arr)
 		#current directory to allow for generalization
 		if (print_bool == 1)
 			if (infocon_bool == 1)
@@ -96,6 +97,7 @@ module solve
 			end
 			CSV.write("$folder/a_data$alloc_designation@$num_objects,$num_types.csv", assign_df, writeheader=false)
 			CSV.write("$folder/t_data$alloc_designation@$num_objects,$num_types.csv", type_df, writeheader=false)
+			CSV.write("$folder/rt_data$alloc_designation@$num_objects,$num_types.csv", rtype_df, writeheader=false)
 			return (assignment_arr,type_arr,type_probs,type_vec_shock,alloc_designation)
 		end
 		if (print_bool == 0)
