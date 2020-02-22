@@ -169,7 +169,7 @@ module gen
 		frm_cap = DataFrame(cap = caps_list)
 
 		#print(frm_cap)
-		d = processor(frm_util, frm_shock, "logistic", frm_cap)
+		d = gen_processor(frm_util, frm_shock, "logistic", frm_cap)
 		return d
 	end
 
