@@ -85,6 +85,7 @@ def concat_page(size_pos,pdf_name,*args):
         #print(x,y,w,h)
         pdf.image(i,x,y,w,h)
         index = index + 1
+        print(index)
     pdf.output(f"solver/assignment_data/{pdf_name}.pdf","F")
 
 def concat_pdfs(pdf_path,*args):
