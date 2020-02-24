@@ -10,11 +10,21 @@ module solve
 	const MOI = MathOptInterface
 
 	#GENERATES AND SOLVES PROBLEM USING GLPK SOLVER
-	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,folder,print_bool,infocon_bool,type_vec_shock)
+	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,folder,,type_vec_shock,print_bool,infocon_bool,eff_bool)
 		m = Model(with_optimizer(GLPK.Optimizer, tm_lim = 60000, msg_lev = GLPK.OFF))
-		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,print_bool,infocon_bool,type_vec_shock)
+		t = processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
 		return t
 	end
+
+	function is_pos(x)
+	    if (x > 0)
+	        return 1
+	    end
+	    if (x <= 0)
+	        return 0
+	    end
+	end
+
 	function mech_basic_glpk_cmd()
 		d = load("$(ARGS[2]).jld")["d"]
 		#println(d)
@@ -30,7 +40,7 @@ module solve
 	end
 
 	###solves given model
-	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,print_bool,infocon_bool,type_vec_shock)
+	function processor(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,m,folder,type_vec_shock,print_bool=1,infocon_bool=1,eff_bool=0)
 		#turn cap_vec into an array
 		#otherwise solver bricks, don't use 0-dim or vector
 
@@ -65,6 +75,15 @@ module solve
 			#Incentive Compatibility constraint
 			@constraint(m, con[i=1:T,j=1:T], add_to_expression!(sum( type_arr[i,k]*X[i,k] for k in 1:A),-sum( type_arr[i,k]*X[j,k] for k in 1:A))>= 0)
 		end
+
+		if (eff_bool = 1)
+		    #Efficiency Constraints
+		    #Ex-Post No-Trade Efficiency Constraint
+		    @constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A], ispos(X[i,k])*ispos(X[j,l])*min((type_arr[i,k] - type_arr[i,l]),(type_arr[j,l]- type_arr[j,k]),max(type_arr[i,k],type_arr[j,k])) >= 0)
+		    #use the sign funtion sign(), use min function
+		    #Not Wasteful Constraint
+		    @constraint(m, nw_con[i=1:T,j=1:T,k=1:A,l=1:A], ispos(X[i,k])*ispos(type_arr[i,l]-type_arr[i,k])*(cap_arr[l] - sum(type_probs[m]*X[m,l]))>= 0)
+		    #use the sign funtion sign()
 
 		#objective
 		@objective(m, Max, sum(type_probs[i]*(transpose(X[i,:])*type_arr[i,:]) for i in 1:T))
