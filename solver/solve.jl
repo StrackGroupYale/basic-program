@@ -58,7 +58,7 @@ module solve
 		@variable(m, X[1:T,1:A])
 
 		#capacity constraint
-		@constraint(m, Ccon[j = 1:A], (transpose(type_probs)*X)[j] <= cap_arr[j])
+		@constraint(m, Ccon[j = 1:A], (transpose(type_probs)*X)[j] <= cap_arr[j] - 1e-4)
 		#println("Capacity constraint ",(transpose(type_probs)*X), "capacity ", cap_arr)
 
 		#feasibility constraint
@@ -79,9 +79,11 @@ module solve
 		if (eff_bool = true)
 		    #Efficiency Constraints
 		    #Ex-Post No-Trade Efficiency Constraint
-			@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],[X[i,k] + abs(X[i,k],m)-0.000000000000001,X[j,l] + abs(X[j,l],m)-0.00000000000000001,-((type_arr[i,l]-type_arr[i,k])+(type_arr[j,k]-type_arr[j,l])+(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.0000000000000001)) + (abs(type_arr[i,l]-type_arr[i,k],m)+abs(type_arr[j,k]-type_arr[j,l],m)+abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.00000000000000001,m)) + 0.00000000000000000001] .>= 0.)
+			#@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],[X[i,k] + abs(X[i,k],m)-0.000000000000001,X[j,l] + abs(X[j,l],m)-0.00000000000000001,-((type_arr[i,l]-type_arr[i,k])+(type_arr[j,k]-type_arr[j,l])+(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.0000000000000001)) + (abs(type_arr[i,l]-type_arr[i,k],m)+abs(type_arr[j,k]-type_arr[j,l],m)+abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.00000000000000001,m)) + 0.00000000000000000001] .>= 0.)
+			@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],[X[i,k] + abs(X[i,k],m),X[j,l] + abs(X[j,l],m),-((type_arr[i,l]-type_arr[i,k])+(type_arr[j,k]-type_arr[j,l])+(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m))) + (abs(type_arr[i,l]-type_arr[i,k],m)+abs(type_arr[j,k]-type_arr[j,l],m)+abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m),m))] .>= 0.)
 		    #Not Wasteful Constraint
-			@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], (X[i,k]+type_arr[i,l]-type_arr[i,k]+cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T)) - (abs(X[i,k],m)+abs(type_arr[i,l]-type_arr[i,k],m)+abs(cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T),m)) -0.00000000000000000000001>= 0.)
+			#@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], (X[i,k]+type_arr[i,l]-type_arr[i,k]+cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T)) - (abs(X[i,k],m)+abs(type_arr[i,l]-type_arr[i,k],m)+abs(cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T),m)) -0.00000000000000000000001<= 0.)
+			@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], (X[i,k]+type_arr[i,l]-type_arr[i,k]+cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T)) - (abs(X[i,k],m)+abs(type_arr[i,l]-type_arr[i,k],m)+abs(cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T),m)) <= 0.)
 		end
 
 		#objective

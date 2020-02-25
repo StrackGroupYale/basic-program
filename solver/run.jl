@@ -6,10 +6,10 @@ include("gen.jl")
 include("solve.jl")
 
 ###GENERATE CONSTRAINED ALLOCS
-x_t.problem_glpk("solver/nt_example/util_data.csv",
-           "solver/nt_example/shock_data.csv",
+x_t.problem_glpk("solver/2x3_example/util_data.csv",
+           "solver/2x3_example/shock_data.csv",
            "logistic",
-           "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",eff_bool=true)
+           "solver/2x3_example/cap_data.csv","solver/2x3_example/assign_data",eff_bool=true)
 ###GENERATE UNCONSTRAINED ALLOCS
 
 
