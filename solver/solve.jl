@@ -16,7 +16,22 @@ module solve
 		@constraint(m, aux >= -v)
 		return aux
 	end
-	
+
+	function double_or_nothing(v,m)
+		aux2 = @variable(m)
+		#if positive, then number goes to zero. if negative, to 2x
+		@constraint(m, aux2 >= (abs(v,m)-v-0.000000000000000000002))
+		@constraint(m, aux2 <= (abs(v,m)-v+0.000000000000000000001))
+		return aux2
+	end
+
+	function is_pos(v,m)
+		aux3 = @variable(m)
+		@constraint(m, aux3 <= 1.0)
+		@constraint(m, aux3 >= -0.001)
+		@constraint(m, aux3 <= abs(double_or_nothing(v,m)-2*abs(v,m),m)) #0 if negative, abs(v,m) if positive
+		return aux3
+	end
 
 	#GENERATES AND SOLVES PROBLEM USING GLPK SOLVER
 	function mech_basic_glpk(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
@@ -77,13 +92,26 @@ module solve
 		end
 
 		if (eff_bool = true)
-		    #Efficiency Constraints
-		    #Ex-Post No-Trade Efficiency Constraint
-			#@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],[X[i,k] + abs(X[i,k],m)-0.000000000000001,X[j,l] + abs(X[j,l],m)-0.00000000000000001,-((type_arr[i,l]-type_arr[i,k])+(type_arr[j,k]-type_arr[j,l])+(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.0000000000000001)) + (abs(type_arr[i,l]-type_arr[i,k],m)+abs(type_arr[j,k]-type_arr[j,l],m)+abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m)-0.00000000000000001,m)) + 0.00000000000000000001] .>= 0.)
-			@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],[X[i,k] + abs(X[i,k],m),X[j,l] + abs(X[j,l],m),-((type_arr[i,l]-type_arr[i,k])+(type_arr[j,k]-type_arr[j,l])+(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m))) + (abs(type_arr[i,l]-type_arr[i,k],m)+abs(type_arr[j,k]-type_arr[j,l],m)+abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m),m))] .>= 0.)
-		    #Not Wasteful Constraint
-			#@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], (X[i,k]+type_arr[i,l]-type_arr[i,k]+cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T)) - (abs(X[i,k],m)+abs(type_arr[i,l]-type_arr[i,k],m)+abs(cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T),m)) -0.00000000000000000000001<= 0.)
-			@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], (X[i,k]+type_arr[i,l]-type_arr[i,k]+cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T)) - (abs(X[i,k],m)+abs(type_arr[i,l]-type_arr[i,k],m)+abs(cap_arr[l]-sum(type_probs[j]*X[j,l] for j in 1:T),m)) <= 0.)
+		    ##Efficiency Constraints
+			
+			#Ex-Post No-Trade Efficiency Constraint
+			@constraint(m, nt_con[i=1:T,j=1:T,k=1:A,l=1:A],
+			#if both aren't positive, dominates inequality
+			-1e5*(is_pos(X[i,k],m) + is_pos(X[j,l],m)-2) 
+			#check if one of the utility differences is negative
+			+is_pos(type_arr[i,k]-type_arr[i,l],m) #1 if true, 0 if false
+			+is_pos(type_arr[j,l]-type_arr[j,k],m) #1 if true, 0 if false
+			#checks if utilities are equal
+			+(1-is_pos(abs(abs(type_arr[i,k]-type_arr[i,l],m)+abs(type_arr[j,k]-type_arr[j,l],m),m)-0.00001,m)) #turns to 0 if false, 1 if true
+			 >= .5) #need at least one condition to hold true
+			
+
+			#Not Wasteful Constraint
+			@constraint(m, nw_con[i=1:T,k=1:A,l=1:A], 
+			is_pos(-X[i,k],m) #indicator for false
+			+is_pos(type_arr[i,k]-type_arr[i,l],m) #indicator for false
+			+is_pos(sum(type_probs[j]*X[j,l] for j in 1:T)-cap_arr[l],m) #indicator for false
+			>= .5)
 		end
 
 		#objective
