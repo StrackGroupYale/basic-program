@@ -7,7 +7,7 @@ module x_t
     using DelimitedFiles
 
     #GENERAL USE, GENERATES AND SOLVES PROBLEM
-    function problem_glpk(utility_means,shocks,shock_distribution,capacities,folder,print_bool=true,infocon_bool=true,eff_bool=false)
+    function problem_glpk(utility_means,shocks,shock_distribution,capacities,folder ; print_bool=true,infocon_bool=true,eff_bool=false)
         inpu = Main.gen.data_gen(utility_means,shocks,shock_distribution,capacities)
         outpu = Main.solve.mech_basic_glpk(inpu[1],inpu[2],inpu[3],inpu[4],inpu[5],inpu[7],folder,inpu[6],print_bool,infocon_bool,eff_bool)
         return outpu
@@ -19,7 +19,7 @@ module x_t
     ##CALCULATE TOTAL WELFARE AND/OR INDIVIDUAL WELFARE
     #df columns initialized as x1,x2,...
 
-    function welfare(alloc,type_prob,utility_types,type_vec_shock,folder,price_bool=false,total_bool=true,indiv_bool=true,fromCSV_bool=false,alloc_designation="constrained")
+    function welfare(alloc,type_prob,utility_types,type_vec_shock,folder; price_bool=false,total_bool=true,indiv_bool=true,fromCSV_bool=false,alloc_designation="constrained")
         if (fromCSV_bool == 1)
             alloc_arr = readdlm(alloc, ',', Float64)
             prob_arr = readdlm(type_prob, ',', Float64)
