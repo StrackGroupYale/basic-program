@@ -138,7 +138,11 @@ module gen
 		d = (num_types,num_objects,type_arr,type_probs,cap_vec,type_vecprint,rtype_arr)
 		return d
 	end
+	"""
+    data_gen(utility_means,shocks,shock_distribution,capacities)
 
+	Returns double the number `x` plus `1`.
+	"""
 	function data_gen(utility_means,shocks,shock_distribution,capacities)
 		frm_util = DataFrame(CSV.File(utility_means))
 		frm_shocks = DataFrame(CSV.File(shocks))
