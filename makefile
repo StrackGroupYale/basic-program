@@ -1,27 +1,14 @@
-#!/bin/bash
+run: solver/run_cmd.jl solve.o x_t.o gen.o
+	julia solver/run_cmd.jl
 
-julia solver/pkgs.jl;
+x_t.o: solver/x_t.jl
+	julia solver/x_t.jl
 
-echo type cmd:
-read cmd
-cmd="\""$cmd"\""
-echo give me a mean Vector:
-read meanVector
-meanVector="\""$meanVector"\""
-echo give me a shock Vector:
-read shockVector
-shockVector="\""$shockVector"\""
-echo give me a distribution:
-read distString
-distString="\""$distString"\""
-echo give me a capacity Vector:
-read capVec
-capVec="\""$capVec"\""
-echo give me an output filename:
-read fileName
-fileName="\""$fileName"\""
+solve.o: solver/solve.jl
+	julia solver/solve.jl
 
-echo "Calculating"
+gen.o: solver/gen.jl
+	julia solver/gen.jl
 
-
-julia solver/gen.jl $cmd $meanVector $shockVector $distString $capVec $fileName
+clean:
+	rm -r *.jld
