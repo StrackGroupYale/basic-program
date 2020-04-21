@@ -13,12 +13,6 @@ x_t.problem_glpk("solver/2x3_example/util_data.csv",
 ###GENERATE UNCONSTRAINED ALLOCS
 
 
-<<<<<<< HEAD
-Main.x_t.problem_glpk("solver/nt_example/util_data.csv",
-           "solver/nt_example/shock_data.csv",
-           "logistic",
-           "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",1,0)
-=======
 #=
 x_t.problem_glpk("solver/nt_example/util_data.csv",
            "solver/nt_example/shock_data.csv",
@@ -57,7 +51,6 @@ x_t.problem_glpk("solver/nt_example/util_data.csv",
            "solver/nt_example/shock_data.csv",
            "logistic",
            "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",info_bool=false,eff_bool=true)
->>>>>>> d956e917c3a503523e12635699bc8d4070ea72d7
 #ARGS: paths to data, path to output
 
 ###EVALUATE WELFARE

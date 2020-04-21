@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#Example.jl-Documentation-1","page":"Example.jl Documentation","title":"Example.jl Documentation","text":"","category":"section"},{"location":"#","page":"Example.jl Documentation","title":"Example.jl Documentation","text":"data_gen(utility_means,shocks,shock_distribution,capacities)","category":"page"},{"location":"#gen.data_gen-NTuple{4,Any}","page":"Example.jl Documentation","title":"gen.data_gen","text":"data_gen(utility_means,shocks,shock_distribution,capacities)\n\nReturns double the number `x` plus `1`.\n\n\n\n\n\n","category":"method"}]
+}
