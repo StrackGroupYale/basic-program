@@ -10,14 +10,22 @@ include("solve.jl")
 x_t.problem_glpk("solver/nt_example/util_data.csv",
            "solver/nt_example/shock_data.csv",
            "logistic",
+<<<<<<< HEAD
            "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",1,1)
+=======
+           "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",1,1,1)
+>>>>>>> d956e917c3a503523e12635699bc8d4070ea72d7
 ###GENERATE UNCONSTRAINED ALLOCS
 
 
 x_t.problem_glpk("solver/nt_example/util_data.csv",
            "solver/nt_example/shock_data.csv",
            "logistic",
+<<<<<<< HEAD
            "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",1,0)
+=======
+           "solver/nt_example/cap_data.csv","solver/nt_example/assign_data",1,0,1)
+>>>>>>> d956e917c3a503523e12635699bc8d4070ea72d7
 #ARGS: paths to data, path to output
 
 ###EVALUATE WELFARE
