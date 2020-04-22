@@ -1,0 +1,7 @@
+pandas
+matplotlib
+seaborn
+fpdf
+more-itertools
+numpy
+PyPDF2

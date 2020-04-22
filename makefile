@@ -1,20 +1,31 @@
-#!/bin/bash
+#source path/to/virtualenv/bin/activate; 
 
-julia solver/pkgs.jl;
+all: run install display
 
-echo type cmd:
-read cmd
-echo give me a mean Vector:
-read meanVector
-echo give me a shock Vector:
-read shockVector
-echo give me a distribution:
-read distString
-echo give me a capacity Vector:
-read capVec
-echo give me an output filename:
-read fileName
 
-echo "Calculating"
+run: solver/run_cmd.jl solve.o x_t.o gen.o
+	julia solver/run_cmd.jl
 
-julia solver/gen.jl $cmd $meanVector $shockVector $distString $capVec $fileName
+x_t.o: solver/x_t.jl
+	julia solver/x_t.jl
+
+solve.o: solver/solve.jl
+	julia solver/solve.jl
+
+gen.o: solver/gen.jl
+	julia solver/gen.jl
+
+install:
+	( \
+		pip install -r requirements.txt; \
+       )
+
+display: dataPresentation.o solver/table_creator.py
+	python3 solver/table_creator.py
+
+dataPresentation.o: solver/data_presentation.py
+	python3 solver/data_presentation.py
+
+
+clean:
+	rm -r *.jld

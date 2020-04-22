@@ -68,5 +68,5 @@ def write_allocs_types_(num_schools,num_types,name,folder_path,gen_utilities_fil
 
 if __name__ == "__main__":
     #write_allocs_types_(2,9,'Allocation_Info','solver/assignment_data','a_data:')
-    write_allocs_types_(4, 625, 'Allocation_Info', 'solver/nt_example/assign_data', 'a_data:')
+    write_allocs_types_(2, 9, 'Allocation_Info', 'solver/2x3_example/assign_data', 'a_data:')
 
