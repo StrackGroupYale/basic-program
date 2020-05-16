@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Gen · Strack Group Project Documentation</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Strack Group Project Documentation</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Manual</span><ul><li class="is-active"><a class="tocitem" href>Gen</a><ul class="internal"><li><a class="tocitem" href="#gen.QuantileVal-1"><span><code>gen.QuantileVal</code></span></a></li><li><a class="tocitem" href="#gen.ProblemGenerator-1"><span><code>gen.ProblemGenerator</code></span></a></li></ul></li><li><a class="tocitem" href="../solve/">Solve</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Manual</a></li><li class="is-active"><a href>Gen</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Gen</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/StrackGroupYale/basic-program/blob/master/docs/src/man/gen.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="gen.jl-Documentation-1"><a class="docs-heading-anchor" href="#gen.jl-Documentation-1">gen.jl Documentation</a><a class="docs-heading-anchor-permalink" href="#gen.jl-Documentation-1" title="Permalink"></a></h1><h2 id="gen.QuantileVal-1"><a class="docs-heading-anchor" href="#gen.QuantileVal-1"><code>gen.QuantileVal</code></a><a class="docs-heading-anchor-permalink" href="#gen.QuantileVal-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="gen.QuantileVal-Tuple{Any,Any}" href="#gen.QuantileVal-Tuple{Any,Any}"><code>gen.QuantileVal</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">QuantileVal(distribution, quant)</code></pre><p>TEXT</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/StrackGroupYale/basic-program/blob/0535c2b2c551a8b7a946e297bc1609d1d78b9afa/src/solver/modules/gen/src/gen.jl#L150-L153">source</a></section></article><p>Takes distribution type and the quantile (i.e. 50 for 50th quantile) and returns pdf evaluated at that quantile. Is used to calculate joint probalities (we assume independence of types). Example:</p><pre><code class="language-julia-repl">julia&gt; using Distributions
+
+julia&gt; include(&quot;/Users/AnR/Dropbox/Basic-Profile/basic-program-share/src/solver/modules/gen/src/gen.jl&quot;)
+Main.##ex-#253.gen
+
+julia&gt; distribution=&quot;logistic&quot;; quant = 40
+40
+
+julia&gt; gen.QuantileVal(distribution,quant)
+0.24</code></pre><h2 id="gen.ProblemGenerator-1"><a class="docs-heading-anchor" href="#gen.ProblemGenerator-1"><code>gen.ProblemGenerator</code></a><a class="docs-heading-anchor-permalink" href="#gen.ProblemGenerator-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="gen.ProblemGenerator-NTuple{5,Any}" href="#gen.ProblemGenerator-NTuple{5,Any}"><code>gen.ProblemGenerator</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">ProblemGenerator(util,shock,cap,shock_distribution,mode)</code></pre><p>TEXT</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/StrackGroupYale/basic-program/blob/0535c2b2c551a8b7a946e297bc1609d1d78b9afa/src/solver/modules/gen/src/gen.jl#L31-L34">source</a></section></article><p>Takes DataFrame inputs for utilities, shocks, capacities, and a shock distribution. Can be switched into DataFrame mode (mode=&quot;DF&quot;) and CSV mode (mode=&quot;CSV&quot;), depending on input type.</p><p>Generates the number of types, means, the vector of capacities, the vector giving the distribution of types, and the set of types in three forms:</p><ul><li>an array of types by quantile (each row is a type)</li><li>an unnormalized array of &quot;raw&quot; types (mean + shock) (each row is a type)</li><li>and a vector of types in vector form. </li></ul><p><code>shock_distribution</code> currently supports only &quot;logistic&quot; and &quot;uniform&quot;.</p><p>Example:</p><pre><code class="language-julia-repl">julia&gt; using DataFrames
+
+julia&gt; include(&quot;/Users/AnR/Dropbox/Basic-Profile/basic-program-share/src/solver/modules/gen/src/gen.jl&quot;)
+Main.##ex-#254.gen
+
+julia&gt; cap_df = DataFrame(cap =[.7,.3]); util_df = DataFrame(mean =[15,20]); shock_df = DataFrame(shock=[.1,.5])
+2×1 DataFrames.DataFrame
+│ Row │ shock   │
+│     │ Float64 │
+├─────┼─────────┤
+│ 1   │ 0.1     │
+│ 2   │ 0.5     │
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[1:2]
+(4, 2)
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[3]
+1×2 Array{Float64,2}:
+ 0.7  0.3
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[4]
+4×2 Array{Float64,2}:
+ 12.8028  17.8028
+ 12.8028  20.0
+ 15.0     17.8028
+ 15.0     20.0
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[5]
+4×1 Array{Any,2}:
+ [0.1, 0.1]
+ [0.1, 0.5]
+ [0.5, 0.1]
+ [0.5, 0.5]
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[6]
+4×2 Array{Float64,2}:
+ 0.1  0.1
+ 0.1  0.5
+ 0.5  0.1
+ 0.5  0.5
+
+julia&gt; gen.ProblemGenerator(util_df,shock_df,cap_df,&quot;logistic&quot;,&quot;DF&quot;)[7]
+4-element Array{Float64,1}:
+ 0.07006920415224915
+ 0.19463667820069208
+ 0.19463667820069208
+ 0.5406574394463667</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../solve/">Solve »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 15 May 2020 23:35">Friday 15 May 2020</span>. Using Julia version 1.4.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
