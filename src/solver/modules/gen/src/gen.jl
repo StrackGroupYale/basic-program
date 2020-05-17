@@ -29,15 +29,17 @@ function expandgrid(args...)
 end
 
 """
-	ProblemGenerator(util,shock,cap,shock_distribution,mode)
-TEXT
+	ProblemGeneratorSimple(util,shock,cap,shock_distribution,mode)
+Takes input parameters for base utilities, quantiles at which preferences are obtained, capacities of objects, and distribution (given as Distributions.jl type).
 """
-function ProblemGenerator(util,shock,cap,shock_distribution,mode)
+function ProblemGeneratorSimple(util,shock,cap,shock_distributions,mode)
+	#either specify a single distribution for all objects, or specify a set of distributions corresponding to the set of objects
 	if mode == "CSV"
 		frm_util = DataFrame(CSV.File(util))
 		frm_shocks = DataFrame(CSV.File(shock))
 		frm_cap = DataFrame(CSV.File(cap))
 	end
+
 	if mode == "DF"
 		frm_util = util
 		frm_shocks = shock
@@ -47,6 +49,26 @@ function ProblemGenerator(util,shock,cap,shock_distribution,mode)
 	num_types = nrow(frm_shocks)^nrow(frm_util) #assuming shocks given with objects in row, each vector as a column
 	num_means = nrow(frm_util)
 	num_shocks = nrow(frm_shocks)
+
+
+	##convert convenience command to array if necessary
+	if isa(shock_distributions,Array) == false
+		a = [shock_distributions]
+		shock_distributions = a
+	end
+	
+	if size(shock_distributions)[1] == 1
+		new = Array{Any}(undef,num_means)
+		for i in 1:num_means
+			new[i] = shock_distributions[1]
+		end
+	elseif size(shock_distributions)[1] == num_means
+		new = shock_distributions
+	else
+		println(size(shock_distributions),size(shock_distributions)[1],num_means)
+		println("ERROR: improper number of distributions specified")
+	end
+	shock_distributions = new
 
 	##convert DataFrames to matrices
 	util_vec = Vector{Float64}(undef, num_means)
@@ -79,15 +101,18 @@ function ProblemGenerator(util,shock,cap,shock_distribution,mode)
 
 	##assume independence across objects
 	##find object shock probabilities, for discrete whole-number quantiles
-	quantile_probs = Vector{Any}(undef, 100)
-	for i in 1:100
-		quantile_probs[i] = QuantileVal(shock_distribution,i)
+	quantile_probs = Array{Any}(undef, num_means, 100)
+	for i in 1:num_means
+		for j in 1:100
+			quantile_probs[i,j] = pdf(shock_distributions[i],quantile(shock_distributions[i],j*(0.01)))
+		end
 	end
-	total = sum(quantile_probs)
 
 	#normalize
-	for i in 1:100
-		quantile_probs[i] = quantile_probs[i]/total
+	for i in 1:num_means
+		for j in 1:100
+			quantile_probs[i,j] = quantile_probs[i,j]/sum(quantile_probs[i,k] for k in 1:100)
+		end
 	end
 
 	##generate distribution for shock vectors
@@ -99,7 +124,7 @@ function ProblemGenerator(util,shock,cap,shock_distribution,mode)
 			if (quant == 0)
 				quant = 1
 			end
-			prob = prob*quantile_probs[quant]
+			prob = prob*quantile_probs[j,quant]
 		end
 		type_probs[i] = prob
 	end
@@ -110,22 +135,15 @@ function ProblemGenerator(util,shock,cap,shock_distribution,mode)
 		type_probs[i] = type_probs[i]/total2
 	end
 
-	##Print "raw" types
-	rtype_arr = Array{Float64}(undef, num_types,num_means)
-	for i in 1:num_types
-		for j in 1:num_means
-			rtype_arr[i,j] = type_vector[i][j]
-		end
-	end
-
 	##generate types
 	type_vec2 = Vector{Any}(undef, num_types)
 	for i in 1:num_types
 
 		#take into account the transformation
 		for j in 1:num_means
-			type_vector[i][j] = quantile(Logistic(),type_vector[i][j])
+			type_vector[i][j] = quantile(shock_distributions[j],type_vector[i][j])
 		end
+
 		type_vec2[i] = broadcast(+,util_vec,type_vector[i])
 	end
 
@@ -143,25 +161,7 @@ function ProblemGenerator(util,shock,cap,shock_distribution,mode)
 		cap_arr[i] = cap_vec[i]
 	end
 
-	d = (num_types,num_means,cap_arr,type_arr,type_vecprint,rtype_arr,type_probs)
-	return d
-end
-
-"""
-	QuantileVal(distribution, quant)
-TEXT
-"""
-function QuantileVal(distribution, quant)
-	d = 0.0
-	if (distribution == "logistic")
-		d = pdf(Logistic(),quantile(Logistic(),quant*(0.01)))
-		return d
-	elseif (distribution == "uniform")
-		d = pdf(Uniform(),quantile(Uniform(),quant*(0.01)))
-		return d
-	else
-		println("Error: distribution type not supported")
-	end
+	return type_arr,type_probs,cap_arr
 end
 
 end #module
@@ -226,4 +226,13 @@ if (size(ARGS)[1]>0)
 		data_gen_cmd()
 	end
 end
+
+	##Print "raw" types
+	rtype_arr = Array{Float64}(undef, num_types,num_means)
+	for i in 1:num_types
+		for j in 1:num_means
+			rtype_arr[i,j] = type_vector[i][j]
+		end
+	end
+
 =#

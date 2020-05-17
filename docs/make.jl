@@ -1,5 +1,4 @@
-#push!(LOAD_PATH,"src/solver/gen.jl")
-push!(LOAD_PATH,"/Users/AnR/Dropbox/basic-profile/basic-program-share/src/solver/modules")
+push!(LOAD_PATH,abspath("../basic-program-share/src/solver/modules"))
 using Documenter, gen, solve
 
 makedocs(

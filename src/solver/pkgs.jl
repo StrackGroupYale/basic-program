@@ -108,6 +108,12 @@ else
     Pkg.build("Plots")
 end
 
+else
+    println("Plots is not installed")
+    Pkg.add("Documenter")
+    Pkg.build("Documenter")
+end
+
 #Pkg.add("CPLEX")
 
 #if in("MathOptInterface",keys(Pkg.installed()))

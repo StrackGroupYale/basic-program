@@ -8,6 +8,7 @@ using DataFrames
 using CSV
 using JLD
 using MathOptInterface
+using gen
 const MOI = MathOptInterface
 import JuMP: GenericAffExpr
 
@@ -42,13 +43,13 @@ end
 ##SOLVES PROBLEM USING GLPK SOLVER
 
 """
-	SolverGLPK(num_types,num_objects,type_arr,type_probs,cap_vec,rtype_arr,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
+	SolverGLPK(num_types,num_objects,type_arr,type_probs,cap_arr,folder,print_bool,infocon_bool,eff_bool)
 
-Applies ModelSolver with GLPK Optimizer
+Applies ModelSolver with GLPK Optimizer.
 """
-function SolverGLPK(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
+function SolverGLPK(type_arr,type_probs,cap_arr,folder,print_bool,infocon_bool,eff_bool)
 	m = Model(optimizer_with_attributes(GLPK.Optimizer, "tm_lim" => 60000, "msg_lev" => GLPK.OFF))
-	t = ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr,m,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
+	t = ModelSolver(type_arr,type_probs,cap_arr,m,folder,print_bool,infocon_bool,eff_bool)
 	return t
 end
 
@@ -56,20 +57,20 @@ end
 ###solves given model
 
 """
-	ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr,m,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
+	ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,m,folder,print_bool,infocon_bool,eff_bool)
 Given a model `m`, ModelSolver solves the optimization problem subject to the appropriate constrains.
 """
-function ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr,m,folder,type_vec_shock,print_bool,infocon_bool,eff_bool)
+function ModelSolver(type_arr,type_probs,cap_arr,m,folder,print_bool,infocon_bool,eff_bool)
 	
-	T = num_types #rows, represents length of Theta
-	A = num_objects #columns, represents length of A
+	T = size(type_arr)[1] #rows, represents length of Theta
+	A = size(type_arr)[2] #columns, represents length of A
 
 	#Alloc variable
 	@variable(m, X[1:T,1:A])
 
 	#capacity constraint
 	@constraint(m, Ccon[j = 1:A], (transpose(type_probs)*X)[j] <= cap_arr[j] - 1e-4) #enforce strictness
-	
+
 	#feasibility constraint
 	ones_T = ones(T,1)
 	ones_A = ones(A,1)
@@ -113,9 +114,9 @@ function ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr
 	status = optimize!(m)
 
 	#find argmax
-	assignment_arr = Array{Float64}(undef, num_types,num_objects)
-	for i in 1:num_types
-		for j in 1:num_objects
+	assignment_arr = Array{Float64}(undef, T,A)
+	for i in 1:T
+		for j in 1:A
 			assignment = MOI.get(m, MOI.VariablePrimal(),X[i,j])
 			if (assignment < 1*10^(-10))
 				assignment = 0.0
@@ -127,7 +128,6 @@ function ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr
 	#turn assignment_arr into a dataframe
 	assign_df = convert(DataFrame,assignment_arr)
 	type_df = convert(DataFrame,type_arr)
-	rtype_df = convert(DataFrame,rtype_arr)
 	#current directory to allow for generalization
 	if (print_bool == true)
 		if (infocon_bool == true)
@@ -138,11 +138,10 @@ function ModelSolver(num_types,num_objects,type_arr,type_probs,cap_arr,rtype_arr
 		end
 		CSV.write("$folder/a_data$alloc_designation@$num_objects,$num_types.csv", assign_df, writeheader=false)
 		CSV.write("$folder/t_data$alloc_designation@$num_objects,$num_types.csv", type_df, writeheader=false)
-		CSV.write("$folder/rt_data$alloc_designation@$num_objects,$num_types.csv", rtype_df, writeheader=false)
-		return (assignment_arr,type_arr,type_probs,type_vec_shock,alloc_designation)
+		return (assignment_arr,type_arr,type_probs,alloc_designation)
 	end
 	if (print_bool == false)
-		return (assignment_arr,type_arr,type_probs,type_vec_shock)
+		return (assignment_arr,type_arr,type_probs)
 	end
 end
 
