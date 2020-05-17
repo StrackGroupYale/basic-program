@@ -108,8 +108,10 @@ else
     Pkg.build("Plots")
 end
 
+if in("Documenter",keys(Pkg.installed()))
+
 else
-    println("Plots is not installed")
+    println("Documenter is not installed")
     Pkg.add("Documenter")
     Pkg.build("Documenter")
 end

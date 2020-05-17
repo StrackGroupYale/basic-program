@@ -31,6 +31,7 @@ end
 """
 	ProblemGeneratorSimple(util,shock,cap,shock_distribution,mode)
 Takes input parameters for base utilities, quantiles at which preferences are obtained, capacities of objects, and distribution (given as Distributions.jl type).
+	
 """
 function ProblemGeneratorSimple(util,shock,cap,shock_distributions,mode)
 	#either specify a single distribution for all objects, or specify a set of distributions corresponding to the set of objects
