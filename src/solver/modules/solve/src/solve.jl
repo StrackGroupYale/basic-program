@@ -55,7 +55,6 @@ function is_pos_float(v,m)
 	end
 end
 
-
 function add_lower_con(m,X,P,type_arr,T,A)
 	@NLexpression(m, my_expr[i=1:T,l=1:A], type_arr[i,l]/(P[l]+1e-7) - sum( type_arr[i,k]*X[i,k] for k in 1:A))
 	@NLconstraint(m, con[i=1:T,l=1:A], my_expr[i,l] <= 0)
@@ -75,9 +74,6 @@ function add_raffle_con(m,X,P,type_arr,type_probs,cap_arr,T,A)
 	@NLconstraint(m, con_slack[l=1:A], my_expr4[l] == 0)
 end
 
-
-##SOLVES PROBLEM USING GLPK SOLVER
-
 """
 	SolverL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false)
 
@@ -85,40 +81,12 @@ Applies ModelSolver with GLPK Optimizer. Use for Linear Programming (without pri
 """
 function SolverL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false)
 	m = Model(optimizer_with_attributes(GLPK.Optimizer, "tm_lim" => 60000, "msg_lev" => GLPK.OFF))
-	t = ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,"none")
-	return t
-end
-
-"""
-	SolverNL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false,price_type="lower")
-
-Applies ModelSolver with Ipopt Optimizer. Use for Nonlinear Programming (with prices)
-"""
-function SolverNL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false,price_type="lower")
-	m = Model(optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0 ))
-	t = ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
-	return t
-end
-
-
-###solves given model
-
-"""
-	ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
-Given a model `m`, ModelSolver solves the optimization problem subject to the appropriate constraints.
-"""
-function ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
 	
 	T = size(type_arr)[1] #rows, represents length of Theta
 	A = size(type_arr)[2] #columns, represents length of A
 
 	#Alloc variable
 	@variable(m, X[1:T,1:A])
-
-	#Price variable
-	if price_type != "none"
-		@variable(m, P[1:A])
-	end
 
 	#capacity constraint
 	@constraint(m, Ccon[j = 1:A], (transpose(type_probs)*X)[j] <= cap_arr[j] - 1e-4) #enforce strictness
@@ -131,15 +99,9 @@ function ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_
 	#non-negativity constraint
 	@constraint(m, ncon, X .>= 0)
 
-	if price_type != "none"
-		@constraint(m, npcon, P .>= 0) #division by zero
-	end
-
 	#Incentive Compatibility constraint
-	if (infocon_bool == true && price_type == "none")
+	if (infocon_bool == true)
 		@constraint(m, con[i=1:T,j=1:T], add_to_expression!(sum( type_arr[i,k]*X[i,k] for k in 1:A),-sum( type_arr[i,k]*X[j,k] for k in 1:A))>= 0)
-	elseif (infocon_bool == false && price_type != "none")
-		println("UNSUPPORTED INPUT PARAMETERS. SEE DOCUMENTATION")
 	end
 
 	##Efficiency Constraints
@@ -183,32 +145,22 @@ function ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_
 		end
 	end
 
-	if price_type != "none"
-		price_arr = Array{Float64}(undef,A)
-		for j in 1:A
-			price = MOI.get(m, MOI.VariablePrimal(),P[j])
-			if (price < 1*10^(-10))
-				price = 0.0
-			end
-			price_arr[j] = price
-		end
-	end
-
 	#find welfare
-	welfare = objective_value(m)
-	if (price_type != "none")
-		return (welfare,assignment_arr,type_arr,type_probs,price_arr)
-	else 
-		return (welfare,assignment_arr,type_arr,type_probs)
+	social_welfare = objective_value(m)
+	indiv_welfare = Array{Float64}(undef,T)
+	for i in 1:T
+		indiv_welfare[i] = sum(X[i,j]*type_arr[i,j] for j in 1:A)
 	end
+	return (social_welfare,indiv_welfare,assignment_arr,type_arr,type_probs)
 end
 
 """
-	ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
-Given a model `m`, ModelSolver solves the optimization problem subject to the appropriate constraints.
+	SolverNL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false,price_type="lower")
+
+Applies ModelSolver with Ipopt Optimizer. Use for Nonlinear Programming (with prices)
 """
-function ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
-	
+function SolverNL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false,price_type="lower")
+	m = Model(optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0 ))
 	#register problems 
 	pos_approx(x) = (2^(10*x)/(2^(10*x)+1))
 	register(m, :pos_approx, 1, pos_approx, autodiff=true)
@@ -221,9 +173,7 @@ function ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price
 	@variable(m, X[1:T,1:A])
 
 	#Price variable
-	if price_type != "none"
-		@variable(m, P[1:A])
-	end
+	@variable(m, P[1:A])
 
 	#capacity constraint
 	@constraint(m, Ccon[j = 1:A], (transpose(type_probs)*X)[j] <= cap_arr[j] - 1e-4) #enforce strictness
@@ -236,14 +186,10 @@ function ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price
 	#non-negativity constraint
 	@constraint(m, ncon, X .>= 0)
 
-	if price_type != "none"
-		@constraint(m, npcon, P .>= 0) #division by zero
-	end
+	@constraint(m, npcon, P .>= 0) #division by zero
 
 	#Incentive Compatibility constraint
-	if (infocon_bool == true && price_type == "none")
-		@constraint(m, con[i=1:T,j=1:T], add_to_expression!(sum( type_arr[i,k]*X[i,k] for k in 1:A),-sum( type_arr[i,k]*X[j,k] for k in 1:A))>= 0)
-	elseif (infocon_bool == true && price_type == "lower")
+	if (infocon_bool == true && price_type == "lower")
 		add_lower_con(m,X,P,type_arr,T,A)
 	elseif (infocon_bool == true && price_type == "upper")
 		add_upper_con(m,X,P,type_arr,T,A)
@@ -294,34 +240,24 @@ function ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price
 		end
 	end
 
-	if price_type != "none"
-		price_arr = Array{Float64}(undef,A)
-		for j in 1:A
-			price = MOI.get(m, MOI.VariablePrimal(),P[j])
-			if (price < 1*10^(-10))
-				price = 0.0
-			end
-			price_arr[j] = price
+	price_arr = Array{Float64}(undef,A)
+	for j in 1:A
+		price = MOI.get(m, MOI.VariablePrimal(),P[j])
+		if (price < 1*10^(-10))
+			price = 0.0
 		end
+		price_arr[j] = price
 	end
 
 	#find welfare
-	welfare = objective_value(m)
-	if (price_type != "none")
-		return (welfare,assignment_arr,type_arr,type_probs,price_arr)
-	else 
-		return (welfare,assignment_arr,type_arr,type_probs)
+	social_welfare = objective_value(m)
+	indiv_welfare = Array{Float64}(undef,T)
+	for i in 1:T
+		indiv_welfare[i] = sum(X[i,j]*type_arr[i,j] for j in 1:A)
 	end
+	return (social_welfare,indiv_welfare,assignment_arr,type_arr,type_probs,price_arr)
 end
 
+####FIND CAPACITY FULFILLMENT
 
 end #module
-
-
-		#@NLexpression(m, expr1[i=1:T,l=1:A], -type_arr[i,l]/(P[l]+1e-7))
-		#@NLexpression(m, expr2[i=1:T,l=1:A], -sum( type_arr[i,k]*X[i,k] for k in 1:A))
-		#@NLexpression(m, my_expr1[i=1:T,l=1:A], pos_approx(expr1[i,l] + expr2[i,l]))
-		#@NLexpression(m, my_expr1[i=1:T,l=1:A], pos(-type_arr[i,l]/(P[l]+1e-7) - sum( type_arr[i,k]*X[i,k] for k in 1:A)))
-		#@expression(m, my_expr2[i=1:T,l=1:A], is_pos(-(1 - sum( type_arr[i,k]*X[i,k] for k in 1:A)),m)) #works
-		#@NLconstraint(m, con[i=1:T,l=1:A], my_expr1[i,l] + my_expr2[i,l] >= .5) #min statement decomposed as or statement
-		#@NLconstraint(m, test_con[i=1:T,l=1:A], my_expr2[i,l] >= 0)
