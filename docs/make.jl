@@ -1,15 +1,17 @@
 push!(LOAD_PATH,abspath("../basic-program-share/src/solver/modules"))
-using Documenter, gen, solve
+using Documenter, gen, solve, timing, plots
 
 makedocs(
     sitename="Strack Group Project Documentation",
     authors = "Joshua Purtell",
-    modules = [gen,solve],
+    modules = [gen,solve, timing, plots],
     pages = [
         "Home" => "index.md",
         "Manual" => [
-            "Gen" => "man/gen.md",
-            "Solve" => "man/solve.md",
+            "Generating a Problem" => "man/gen.md",
+            "Solving a Problem" => "man/solve.md",
+            "Timing Functions" => "man/timing.md",
+            "Plotting" => "man/plots.md",
         ]
     ]
 )

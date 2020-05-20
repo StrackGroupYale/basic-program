@@ -1,6 +1,5 @@
-push!(LOAD_PATH, "/Users/AnR/documents")
 using Revise
-module x_t
+module timing
     export problem_glpk, direct_glpk, time_test, welfare
     using CSV
     using DataFrames

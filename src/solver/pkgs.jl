@@ -116,6 +116,14 @@ else
     Pkg.build("Documenter")
 end
 
+if in("Ipopt",keys(Pkg.installed()))
+
+else
+    println("Ipopt is not installed")
+    Pkg.add("Ipopt")
+    Pkg.build("Ipopt")
+end
+
 #Pkg.add("CPLEX")
 
 #if in("MathOptInterface",keys(Pkg.installed()))

@@ -1,13 +1,14 @@
-
 # solve.jl Documentation
 ```@meta
 CurrentModule = solve
 ```
 
-## `solve.SolverGLPK`
+## `solve.SolverL`
 ```@docs
-SolverGLPK(type_arr,type_probs,cap_arr,folder,print_bool,infocon_bool,eff_bool)
+SolverL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false)
 ```
+This solver should be used for linear programming problems, as the GLPK optimizer used only accepts such problems. For non-linear problems (using prices), please see [`SolverNL`](@ref).
+
 Let us consider an example where the input is constructed using [`gen.ProblemGeneratorSimple`](@ref). 
 ```@repl
 using DataFrames, Distributions
@@ -18,11 +19,13 @@ include(abspath("../../../../basic-program-share/src/solver/modules/solve/src/so
 using JuMP, GLPK, MathOptInterface
 const MOI = MathOptInterface
 import JuMP: GenericAffExpr
-assignments = solve.SolverGLPK(input[1],input[2],input[3],"output",0,1,0)[1]
-corresponding_types = solve.SolverGLPK(input[1],input[2],input[3],"output",0,1,0)[2]
-distribution_of_corresponding_types = solve.SolverGLPK(input[1],input[2],input[3],"output",0,1,0)[3]
+a,b,c,d = solve.SolverL(input[1],input[2],input[3])
+welfare = a
+assignments = b
+corresponding_types = c
+distribution_of_corresponding_types = d
 ```
-Next, let consider an example where the input is given directly.
+Next, let's consider an example where the input is given directly.
 ```@repl
 using DataFrames, Distributions
 include(abspath("../../../../basic-program-share/src/solver/modules/solve/src/solve.jl"))
@@ -33,23 +36,92 @@ rng = MersenneTwister(1234);
 type_arr = randn!(rng,zeros(4,2)); type_arr = broadcast(+,1,type_arr)
 type_probs = randn!(rng,zeros(4,2)); type_probs = broadcast(+,1,type_probs); type_probs = broadcast(/,type_probs,sum(type_probs))
 cap_arr = Array{Float64}(undef, 2); cap_arr[1] = .5; cap_arr[2] = .8
-assignments = solve.SolverGLPK(type_arr,type_probs,cap_arr,"output",0,1,0)[1]
-corresponding_types = solve.SolverGLPK(type_arr,type_probs,cap_arr,"output",0,1,0)[2]
-distribution_of_corresponding_types = solve.SolverGLPK(type_arr,type_probs,cap_arr,"output",0,1,0)[3]
+a,b,c,d = solve.SolverL(type_arr,type_probs,cap_arr)
+welfare = a
+assignments = b
+corresponding_types = c
+distribution_of_corresponding_types = d
 ```
-
-## `solve.ModelSolver`
+## `solve.SolverNL`
 ```@docs
-ModelSolver(type_arr,type_probs,cap_arr,m,folder,print_bool,infocon_bool,eff_bool)
+SolverNL(type_arr,type_probs,cap_arr;infocon_bool=true,eff_bool=false,price_type="lower")
+```
+
+This solver should be used for non-linear programming problems (typically using prices), as the Ipopt optimizer used is not optimized for linear programming and will underperform the optimizer used in [`SolverL`](@ref).
+
+Let us consider an example of a lower-bound price-regime where the input is constructed using [`gen.ProblemGeneratorSimple`](@ref). 
+```@repl
+using DataFrames, Distributions
+include(abspath("../../../../basic-program-share/src/solver/modules/gen/src/gen.jl"))
+cap_df = DataFrame(cap =[.3,.7]); util_df = DataFrame(mean =[10,15]); shock_df = DataFrame(shock=[.1,.9])
+input = gen.ProblemGeneratorSimple(util_df,shock_df,cap_df,Logistic(),"DF")
+include(abspath("../../../../basic-program-share/src/solver/modules/solve/src/solve.jl"))
+using JuMP, GLPK, MathOptInterface, Ipopt
+const MOI = MathOptInterface
+import JuMP: GenericAffExpr
+a,b,c,d,f = solve.SolverNL(input[1],input[2],input[3],price_type="lower")
+welfare = a
+assignments = b
+corresponding_types = c
+distribution_of_corresponding_types = d
+prices = f
+```
+
+Now, let us consider an example of an upper-bound price-regime where the input is constructed using [`gen.ProblemGeneratorSimple`](@ref). 
+```@repl
+using DataFrames, Distributions
+include(abspath("../../../../basic-program-share/src/solver/modules/gen/src/gen.jl"))
+cap_df = DataFrame(cap =[.3,.7]); util_df = DataFrame(mean =[10,15]); shock_df = DataFrame(shock=[.1,.9])
+input = gen.ProblemGeneratorSimple(util_df,shock_df,cap_df,Logistic(),"DF")
+include(abspath("../../../../basic-program-share/src/solver/modules/solve/src/solve.jl"))
+using JuMP, GLPK, MathOptInterface, Ipopt
+const MOI = MathOptInterface
+import JuMP: GenericAffExpr
+a,b,c,d,f = solve.SolverNL(input[1],input[2],input[3],price_type="upper")
+welfare = a
+assignments = b
+corresponding_types = c
+distribution_of_corresponding_types = d
+prices = f
+```
+
+Finally, let us consider an example of a raffle regime where the input is constructed using [`gen.ProblemGeneratorSimple`](@ref). 
+```@repl
+using DataFrames, Distributions
+include(abspath("../../../../basic-program-share/src/solver/modules/gen/src/gen.jl"))
+cap_df = DataFrame(cap =[.3,.7]); util_df = DataFrame(mean =[10,15]); shock_df = DataFrame(shock=[.1,.9])
+input = gen.ProblemGeneratorSimple(util_df,shock_df,cap_df,Logistic(),"DF")
+include(abspath("../../../../basic-program-share/src/solver/modules/solve/src/solve.jl"))
+using JuMP, GLPK, MathOptInterface, Ipopt
+const MOI = MathOptInterface
+import JuMP: GenericAffExpr
+a,b,c,d,f = solve.SolverNL(input[1],input[2],input[3],price_type="raffle")
+welfare = a
+assignments = b
+corresponding_types = c
+distribution_of_corresponding_types = d
+prices = f
+```
+
+As we can see, here the bounds are rather tight, and the proposition that the raffle regime will obtain a welfare lower than that of the optimal price regime is corroborated.
+
+## `solve.ModelSolverL`
+```@docs
+ModelSolverL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
 ```
 
 
-Given the number of types, number of means, capacity array, type arrays and type distribution, finds the optimal allocation given the following constraints:
+Given the type array, type distribution, and capacity array, finds the optimal allocation given the following constraints:
 - Capacity: ``\Sigma_{\theta \in \Theta} f_{\theta} m_{\theta a} \leq c_a, \forall a \in A``
 - Feasibility: ``\Sigma_{a \in A} m_{\theta a} \leq 1, \forall \theta \in \Theta``
 - Non-negativity: `` m_{\theta a} \geq 0, \forall (\theta,a) \in \Theta \times A``
 - (Incentive Compatibility, applied when `infocon_bool`==1): ``\Sigma_{a \in A} u_{\theta a} m_{\theta a} - \Sigma_{a \in A} u_{\theta a} m_{\theta' a} \geq 0, \forall \theta,\theta' \in \Theta``
-- (Efficiency, applied when `eff_bool`==1): pending
-Saves the following tuple when `print_bool` ==1: (assignment array,type array,type distribution array, vector of type vectors by shock, incentive constraint designation). Otherwise, returns (assignment array,type array,type distribution array, vector of type vectors by shock). Assignment array takes the form such that element `(i,j)` gives the probability that type `i` is assigned to each object `j`.
+- (Efficiency, applied when `eff_bool==1`): pending
+Saves the following tuple when `print_bool ==1` to the folder given by `folder ==path/to/folder`: (assignment array,type array,type distribution array, incentive constraint designation). Otherwise, returns (assignment array,type array,type distribution array). Assignment array takes the form such that element `(i,j)` gives the probability that type `i` is assigned to each object `j`.
 
-Is parametrized such that the type distribution represents unit capacity.
+Is parametrized such that the type distribution represents unit capacity. Because prices enter the price mechanism via an incentive constraint, this solver does not support inputs for which `price_type!="none"` and `info_bool==false`.
+
+## `solve.ModelSolverNL`
+```@docs
+ModelSolverNL(type_arr,type_probs,cap_arr,m,infocon_bool,eff_bool,price_type)
+```
